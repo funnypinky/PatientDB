@@ -8,6 +8,22 @@ and open the template in the editor.
     Author     : user
 */
 
+@font-face {
+    font-family: "ClearSans";
+    src: url('ClearSans-Regular.ttf');
+}
+
+.root {
+    -fx-font-family: "ClearSans";
+    -fx-base: hsb(202, 19%, 40.2%);
+    -fx-background-image: url("images/background.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right 3.5%;
+    -fx-background-size: 100 100;
+    
+}
 .Menubar {
-    -fx-font-size: 8px;
+    -fx-font-size: 13px;
+    -fx-padding-top: 3px;
+    -fx-padding-bottom: 3px;
 }
