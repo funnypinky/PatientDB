@@ -27,6 +27,8 @@ public class PatientDB extends Application {
         this.stage = stage;
         initRootPane();
         initPatientView();
+        this.stage.setMaximized(true);
+        this.stage.show();
     }
 
     private void initRootPane() {
@@ -39,8 +41,6 @@ public class PatientDB extends Application {
 
             Scene scene = new Scene(rootLayout);
             stage.setScene(scene);
-            stage.setMaximized(true);
-            stage.show();
 
         } catch (IOException e) {
         }

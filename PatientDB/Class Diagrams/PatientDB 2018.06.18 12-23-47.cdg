@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ClassDiagram name="PatientDB">
+  <ClassDiagramComponents>
+    <Class name="PatientDB" package="patientdb" visibility="public" xPosition="20.0" yPosition="20.0">
+      <Fields>
+        <Field name="stage" type="Stage" visibility="private"/>
+        <Field name="rootLayout" type="BorderPane" visibility="private"/>
+      </Fields>
+      <Constructors/>
+      <Methods>
+        <Method name="start" returnType="Stage" visibility="public">
+          <Argument type="Stage" name="stage"/>
+        </Method>
+        <Method name="initRootPane" returnType="void" visibility="private"/>
+        <Method name="initPatientView" returnType="void" visibility="private"/>
+        <Method name="main" returnType="String[]" visibility="public" isStatic="true">
+          <Argument type="String[]" name="args"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="MainViewController" package="patientdb.view" visibility="public" xPosition="320.0" yPosition="20.0">
+      <Fields>
+        <Field name="label" type="Label" visibility="private"/>
+      </Fields>
+      <Constructors/>
+      <Methods>
+        <Method name="handleButtonAction" returnType="ActionEvent" visibility="private">
+          <Argument type="ActionEvent" name="event"/>
+        </Method>
+        <Method name="initialize" returnType="ResourceBundle" visibility="public">
+          <Argument type="URL" name="url"/>
+          <Argument type="ResourceBundle" name="rb"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="Patient" package="" visibility="public" xPosition="162.0" yPosition="280.0">
+      <Fields>
+        <Field name="ID" type="String" visibility="private"/>
+        <Field name="uniqueID" type="Long" visibility="private"/>
+        <Field name="lastName" type="String" visibility="private"/>
+        <Field name="firstName" type="Stirng" visibility="private"/>
+        <Field name="surName" type="String" visibility="private"/>
+        <Field name="birthday" type="Date" visibility="private"/>
+        <Field name="dianoses" type="Diagnosis" visibility="private"/>
+      </Fields>
+      <Constructors/>
+      <Methods/>
+    </Class>
+    <Class name="Diagnosis" package="" visibility="public" xPosition="499.0" yPosition="318.0">
+      <Fields>
+        <Field name="staging" type="Staging" visibility="private"/>
+        <Field name="therapy" type="Therapy" visibility="private"/>
+        <Field name="ICD10" type="String" visibility="private"/>
+      </Fields>
+      <Constructors/>
+      <Methods/>
+    </Class>
+    <Class name="Staging" package="" visibility="public" xPosition="837.0" yPosition="217.0">
+      <Fields>
+        <Field name="TNM" type="String" visibility="private"/>
+        <Field name="stadium" type="String" visibility="private"/>
+        <Field name="grading" type="String" visibility="private"/>
+        <Field name="resektion" type="String" visibility="private"/>
+      </Fields>
+      <Constructors/>
+      <Methods/>
+    </Class>
+    <Class name="Therapy" package="" visibility="public" xPosition="837.0" yPosition="469.0">
+      <Fields/>
+      <Constructors/>
+      <Methods/>
+    </Class>
+    <Interface name="Serializable" package="" visibility="public" xPosition="162.0" yPosition="552.0">
+      <Methods/>
+    </Interface>
+  </ClassDiagramComponents>
+  <ClassDiagramRelations>
+    <HasRelation name="Therapy" source="Diagnosis" target="Therapy" type="Default" sourceCardinality="0..1" targetCardinality="1..*" collectionType="List"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Patient" target="Serializable"/>
+    <HasRelation name="stagging" source="Diagnosis" target="Staging" type="Default" sourceCardinality="0..1" targetCardinality="1..1"/>
+    <HasRelation name="diagnosiss" source="Patient" target="Diagnosis" type="Default" sourceCardinality="0..1" targetCardinality="1..*" collectionType="List"/>
+  </ClassDiagramRelations>
+</ClassDiagram>
