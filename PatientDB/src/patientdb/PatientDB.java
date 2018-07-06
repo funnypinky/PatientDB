@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package patientdb;
 
 import java.io.IOException;
@@ -13,13 +8,10 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-/**
- *
- * @author user
- */
 public class PatientDB extends Application {
 
     private Stage stage;
+
     private BorderPane rootLayout;
 
     @Override
@@ -27,7 +19,8 @@ public class PatientDB extends Application {
         this.stage = stage;
         initRootPane();
         initPatientView();
-        this.stage.setMaximized(true);
+        this.stage.setMinHeight(800.0);
+        this.stage.setMinWidth(1200.0);
         this.stage.show();
     }
 
@@ -35,16 +28,12 @@ public class PatientDB extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getResource("view/MainView.fxml"));
-
             rootLayout = (BorderPane) loader.load();
             rootLayout.getStylesheets().add(getClass().getResource("view/ModernTheme.css").toExternalForm());
-
             Scene scene = new Scene(rootLayout);
             stage.setScene(scene);
-
         } catch (IOException e) {
         }
-
     }
 
     private void initPatientView() {
@@ -52,20 +41,12 @@ public class PatientDB extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getResource("view/patientView.fxml"));
             SplitPane patientOverview = (SplitPane) loader.load();
-            // Set person overview into the center of root layout.
-
             rootLayout.setCenter(patientOverview);
-            //patientOverview.autosize();
-
         } catch (IOException e) {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         launch(args);
     }
-
 }

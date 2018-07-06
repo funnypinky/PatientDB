@@ -43,6 +43,9 @@
         <Field name="surName" type="String" visibility="private"/>
         <Field name="birthday" type="Date" visibility="private"/>
         <Field name="dianoses" type="Diagnosis" visibility="private"/>
+        <Field name="study" type="Boolean" visibility="private"/>
+        <Field name="pretherapy" type="String" visibility="private"/>
+        <Field name="comments" type="List&lt;String&gt;" visibility="private"/>
       </Fields>
       <Constructors/>
       <Methods/>
@@ -52,6 +55,10 @@
         <Field name="staging" type="Staging" visibility="private"/>
         <Field name="therapy" type="Therapy" visibility="private"/>
         <Field name="ICD10" type="String" visibility="private"/>
+        <Field name="tumorentity" type="String" visibility="private"/>
+        <Field name="primary" type="Boolean" visibility="private"/>
+        <Field name="rezidiv" type="Boolean" visibility="private"/>
+        <Field name="preop" type="boolean" visibility="private"/>
       </Fields>
       <Constructors/>
       <Methods/>
@@ -62,23 +69,32 @@
         <Field name="stadium" type="String" visibility="private"/>
         <Field name="grading" type="String" visibility="private"/>
         <Field name="resektion" type="String" visibility="private"/>
+        <Field name="size" type="String" visibility="private"/>
+        <Field name="histology" type="String" visibility="private"/>
       </Fields>
       <Constructors/>
       <Methods/>
     </Class>
     <Class name="Therapy" package="" visibility="public" xPosition="837.0" yPosition="469.0">
-      <Fields/>
+      <Fields>
+        <Field name="simCT" type="Boolean" visibility="private"/>
+        <Field name="simRT" type="Boolean" visibility="private"/>
+        <Field name="firstHT" type="Date" visibility="private"/>
+        <Field name="plannedHT" type="int" visibility="private"/>
+        <Field name="remainHT" type="int" visibility="private"/>
+        <Field name="complication" type="String" visibility="private"/>
+      </Fields>
       <Constructors/>
       <Methods/>
     </Class>
-    <Interface name="Serializable" package="" visibility="public" xPosition="162.0" yPosition="552.0">
+    <Interface name="Serializable" package="" visibility="public" xPosition="166.0" yPosition="594.0">
       <Methods/>
     </Interface>
   </ClassDiagramComponents>
   <ClassDiagramRelations>
-    <HasRelation name="Therapy" source="Diagnosis" target="Therapy" type="Default" sourceCardinality="0..1" targetCardinality="1..*" collectionType="List"/>
-    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Patient" target="Serializable"/>
-    <HasRelation name="stagging" source="Diagnosis" target="Staging" type="Default" sourceCardinality="0..1" targetCardinality="1..1"/>
     <HasRelation name="diagnosiss" source="Patient" target="Diagnosis" type="Default" sourceCardinality="0..1" targetCardinality="1..*" collectionType="List"/>
+    <HasRelation name="stagging" source="Diagnosis" target="Staging" type="Default" sourceCardinality="0..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Patient" target="Serializable"/>
+    <HasRelation name="Therapy" source="Diagnosis" target="Therapy" type="Default" sourceCardinality="0..1" targetCardinality="1..*" collectionType="List"/>
   </ClassDiagramRelations>
 </ClassDiagram>
