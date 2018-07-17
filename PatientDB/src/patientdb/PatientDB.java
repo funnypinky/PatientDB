@@ -29,8 +29,9 @@ public class PatientDB extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getResource("view/MainView.fxml"));
             rootLayout = (BorderPane) loader.load();
-            rootLayout.getStylesheets().add(getClass().getResource("view/ModernTheme.css").toExternalForm());
+            //rootLayout.getStylesheets().add(getClass().getResource("view/ModernTheme.css").toExternalForm());
             Scene scene = new Scene(rootLayout);
+            scene.getStylesheets().addAll(this.getClass().getResource("view/ModernTheme.css").toExternalForm());
             stage.setScene(scene);
         } catch (IOException e) {
         }

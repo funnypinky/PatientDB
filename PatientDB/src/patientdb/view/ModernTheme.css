@@ -16,11 +16,6 @@ and open the template in the editor.
 .root {
     -fx-font-family: "ClearSans";
     -fx-base: hsb(310, 4%, 24%);
-    -fx-background-image: url("images/background.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: bottom right 1.5%;
-    -fx-background-size: 100 100;
-    
 }
 .Menubar {
     -fx-font-size: 13px;
@@ -29,4 +24,16 @@ and open the template in the editor.
 }
 .GridPane {
     -fx-hgap: 4; 
+}
+
+.datePicker:disabled, .datePicker:disabled>*,.comboBox:disabled,.comboBox:disabled>*{
+    -fx-opacity: .85;
+}
+
+.patientTable {
+    -fx-background-image: url("images/background.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 150 150;
+    -fx-background-opacity: .5;
 }
