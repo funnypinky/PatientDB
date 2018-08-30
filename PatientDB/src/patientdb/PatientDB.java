@@ -1,6 +1,8 @@
 package patientdb;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,6 +16,7 @@ public class PatientDB extends Application {
 
     private BorderPane rootLayout;
 
+
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -22,6 +25,7 @@ public class PatientDB extends Application {
         this.stage.setMinHeight(800.0);
         this.stage.setMinWidth(1200.0);
         this.stage.show();
+        this.stage.setTitle("Hyperthermie Patient Datenbank");
     }
 
     private void initRootPane() {
@@ -49,5 +53,10 @@ public class PatientDB extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("[i] "+LocalDate.now()+" "+LocalTime.now()+" Stage is closing");
     }
 }

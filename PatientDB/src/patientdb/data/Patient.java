@@ -3,6 +3,7 @@ package patientdb.data;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Patient implements Serializable {
 
@@ -128,4 +129,17 @@ public class Patient implements Serializable {
         this.sex = sex;
     }
 
+    public HashMap toMap(){
+        HashMap map = new HashMap();
+        map.put("AriaID", this.ariaID);
+        map.put("BirthDay", this.birthday);
+        map.put("DeathDay", this.deathDay);
+        map.put("FirstName", this.firstName);
+        map.put("LastName", this.lastName);
+        map.put("Sex", this.sex);
+        map.put("Study", this.study);
+        map.put("Pretherapy", this.pretherapy);
+        map.put("Study", this.study);
+        return map;
+    }
 }

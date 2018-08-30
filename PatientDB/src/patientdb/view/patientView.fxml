@@ -24,8 +24,8 @@
             <AnchorPane>
                <children>
                   <Button fx:id="newPatientBt" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient" />
-                  <Button fx:id="changePatientBt" layoutX="90.0" mnemonicParsing="false" text="Patient ändern" />
-                  <Button fx:id="deletePatientBt" layoutX="184.0" mnemonicParsing="false" text="Patient löschen" />
+                  <Button fx:id="changePatientBt" layoutX="90.0" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
+                  <Button fx:id="deletePatientBt" layoutX="184.0" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
                   <Button fx:id="saveNewPatient" layoutX="302.0" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
                   <Button fx:id="abortNewPatient" layoutX="371.0" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
                </children>

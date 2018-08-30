@@ -21,13 +21,19 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import patientdb.DatabaseConnection;
 import patientdb.data.Patient;
 
 /**
  *
  * @author shaesler
+ * @TODO Ändern implementieren
+ *
  */
 public class PatientViewController implements Initializable {
+
+    private boolean statusCreate = false;
+    private Patient oldPatient;
 
     @FXML
     private Button newPatientBt;
@@ -96,6 +102,8 @@ public class PatientViewController implements Initializable {
     @FXML
     private TableColumn birthdayColumn;
 
+    private final DatabaseConnection connection = new DatabaseConnection();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         sexBox.getItems().addAll("Weiblich", "Männlich", "Unbestimmt");
@@ -104,6 +112,7 @@ public class PatientViewController implements Initializable {
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         idColumn.setCellValueFactory(new PropertyValueFactory<>("ariaID"));
         birthdayColumn.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+        patientTable.getItems().addAll(connection.getPatientList());
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 getPatientFromList(null);
@@ -117,34 +126,12 @@ public class PatientViewController implements Initializable {
         //Set another Button disable
         changePatientBt.setDisable(true);
         deletePatientBt.setDisable(true);
-
-        //Enable Edit
-        definitivBoolean.setDisable(!definitivBoolean.isDisable());
-        preopBoolean.setDisable(!preopBoolean.isDisable());
-        primaryBoolean.setDisable(!primaryBoolean.isDisable());
-        rezidivBoolean.setDisable(!rezidivBoolean.isDisable());
-        simCTBoolean.setDisable(!simCTBoolean.isDisable());
-        simRTBoolean.setDisable(!simRTBoolean.isDisable());
-        studyBoolean.setDisable(!studyBoolean.isDisable());
-
-        birthdayTF.setDisable(!birthdayTF.isDisable());
-        deathTF.setDisable(!deathTF.isDisable());
-        firstHTDate.setDisable(!firstHTDate.isDisable());
-
-        commentTA.setEditable(!commentTA.isEditable());
-        compilikationTA.setEditable(!compilikationTA.isEditable());
-
-        ariaIDTF.setEditable(!ariaIDTF.isEditable());
-        compSessionTF.setEditable(!compSessionTF.isEditable());
-        lastNameTF.setEditable(!lastNameTF.isEditable());
-        plannedSessionTF.setEditable(!plannedSessionTF.isEditable());
-        sizeTF.setEditable(!sizeTF.isEditable());
-        firstNameTF.setEditable(!firstNameTF.isEditable());
-
-        sexBox.setDisable(!sexBox.isDisable());
-
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
+
+        this.statusCreate = true;
+        //Enable Edit
+        changeEditStatus(true);
     }
 
     @FXML
@@ -152,54 +139,24 @@ public class PatientViewController implements Initializable {
         //Set another Button disable
         changePatientBt.setDisable(false);
         deletePatientBt.setDisable(false);
-
-        //Enable Edit
-        definitivBoolean.setDisable(!definitivBoolean.isDisable());
-        definitivBoolean.setSelected(false);
-        preopBoolean.setDisable(!preopBoolean.isDisable());
-        preopBoolean.setSelected(false);
-        primaryBoolean.setDisable(!primaryBoolean.isDisable());
-        primaryBoolean.setSelected(false);
-        rezidivBoolean.setDisable(!rezidivBoolean.isDisable());
-        rezidivBoolean.setSelected(false);
-        simCTBoolean.setDisable(!simCTBoolean.isDisable());
-        simCTBoolean.setSelected(false);
-        simRTBoolean.setDisable(!simRTBoolean.isDisable());
-        simRTBoolean.setSelected(false);
-        studyBoolean.setDisable(!studyBoolean.isDisable());
-        studyBoolean.setSelected(false);
-
-        birthdayTF.setDisable(!birthdayTF.isDisable());
-        birthdayTF.setValue(null);
-        deathTF.setDisable(!deathTF.isDisable());
-        deathTF.setValue(null);
-        firstHTDate.setDisable(!firstHTDate.isDisable());
-        firstHTDate.setValue(null);
-
-        commentTA.setEditable(!commentTA.isEditable());
-        commentTA.clear();
-        compilikationTA.setEditable(!compilikationTA.isEditable());
-        compilikationTA.clear();
-
-        ariaIDTF.setEditable(!ariaIDTF.isEditable());
-        ariaIDTF.clear();
-        compSessionTF.setEditable(!compSessionTF.isEditable());
-        compSessionTF.clear();
-        firstNameTF.setEditable(!firstNameTF.isEditable());
-        firstNameTF.clear();
-        plannedSessionTF.setEditable(!plannedSessionTF.isEditable());
-        plannedSessionTF.clear();
-        sizeTF.setEditable(!sizeTF.isEditable());
-        sizeTF.clear();
-        lastNameTF.setEditable(!lastNameTF.isEditable());
-        lastNameTF.clear();
-
-        sexBox.setDisable(!sexBox.isDisable());
-
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
 
+        changeEditStatus(false);
+
+        birthdayTF.setValue(null);
+        deathTF.setValue(null);
+        firstHTDate.setValue(null);
+        commentTA.clear();
+        compilikationTA.clear();
+        ariaIDTF.clear();
+        compSessionTF.clear();
+        firstNameTF.clear();
+        plannedSessionTF.clear();
+        sizeTF.clear();
+        lastNameTF.clear();
         sexBox.setValue("Unbestimmt");
+        getPatientFromList(null);
     }
 
     @FXML
@@ -217,29 +174,87 @@ public class PatientViewController implements Initializable {
             }
         }
     }
+
     @FXML
     public void createNewPatient(ActionEvent event) {
         Patient patient = new Patient();
-        patient.setUniqueID(Math.round(Math.random()*1000));
+        patient.setUniqueID(Math.round(Math.random() * 1000));
         patient.setAriaID(ariaIDTF.getText());
         patient.setFirstName(firstNameTF.getText());
         patient.setLastName(lastNameTF.getText());
         patient.setBirthday(birthdayTF.getValue());
         patient.setDeathDay(deathTF.getValue());
         patient.setSex(sexBox.getValue().toString());
-        patientTable.getItems().add(patient);
-        
-        abortPatient(event);
+        if (this.statusCreate) {
+            if (this.connection.addPatient(patient)) {
+                patientTable.getItems().add(patient);
+                abortPatient(event);
+                this.statusCreate = false;
+            }
+        } else {
+            if (this.connection.updatePatient(patient, oldPatient.getAriaID())) {
+                abortPatient(event);
+                this.statusCreate = false;
+            }
+        }
     }
-    
+
     @FXML
     public void getPatientFromList(ActionEvent event) {
-        Patient selectPatient = (Patient)patientTable.getSelectionModel().getSelectedItem();
+        Patient selectPatient = (Patient) patientTable.getSelectionModel().getSelectedItem();
         ariaIDTF.setText(selectPatient.getAriaID());
         firstNameTF.setText(selectPatient.getFirstName());
         lastNameTF.setText(selectPatient.getLastName());
         birthdayTF.setValue(selectPatient.getBirthday());
         deathTF.setValue(selectPatient.getDeathDay());
         sexBox.setValue(selectPatient.getSex());
+    }
+
+    @FXML
+    public void deletePatient(ActionEvent event) {
+        if (connection.deletePatient((Patient) patientTable.getSelectionModel().getSelectedItem())) {
+            patientTable.getItems().remove(patientTable.getSelectionModel().getSelectedIndex());
+        }
+    }
+
+    @FXML
+    public void changePatient(ActionEvent event) {
+        this.oldPatient = (Patient) patientTable.getSelectionModel().getSelectedItem();
+        changeEditStatus(true);
+        sexBox.setValue(oldPatient.getSex());
+        saveNewPatient.setVisible(!saveNewPatient.isVisible());
+        abortNewPatient.setVisible(!abortNewPatient.isVisible());
+    }
+
+    private void changeEditStatus(boolean status) {
+        //Enable Edit
+        definitivBoolean.setDisable(!status);
+        preopBoolean.setDisable(!status);
+        primaryBoolean.setDisable(!status);
+        rezidivBoolean.setDisable(!status);
+        simCTBoolean.setDisable(!status);
+        simRTBoolean.setDisable(!status);
+        studyBoolean.setDisable(!status);
+
+        birthdayTF.setDisable(!status);
+        birthdayTF.setEditable(status);
+        deathTF.setDisable(!status);
+        deathTF.setEditable(status);
+        firstHTDate.setDisable(!status);
+        firstHTDate.setEditable(status);
+
+        commentTA.setEditable(status);
+        compilikationTA.setEditable(status);
+
+        ariaIDTF.setEditable(status);
+        compSessionTF.setEditable(status);
+        firstNameTF.setEditable(status);
+        plannedSessionTF.setEditable(status);
+
+        sizeTF.setEditable(status);
+        lastNameTF.setEditable(status);
+
+        sexBox.setEditable(status);
+        sexBox.setDisable(!status);
     }
 }
