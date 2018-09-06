@@ -8,11 +8,7 @@ public class Diagnosis implements Serializable {
 
     private Staging staging;
 
-    private Therapy therapy;
-
     private String ICD10;
-
-    private String tumorentity;
 
     private Boolean primary;
 
@@ -28,28 +24,12 @@ public class Diagnosis implements Serializable {
         this.staging = staging;
     }
 
-    public Therapy getTherapy() {
-        return therapy;
-    }
-
-    public void setTherapy(Therapy therapy) {
-        this.therapy = therapy;
-    }
-
     public String getICD10() {
         return ICD10;
     }
 
     public void setICD10(String ICD10) {
         this.ICD10 = ICD10;
-    }
-
-    public String getTumorentity() {
-        return tumorentity;
-    }
-
-    public void setTumorentity(String tumorentity) {
-        this.tumorentity = tumorentity;
     }
 
     public Boolean getPrimary() {

@@ -25,7 +25,7 @@ public class Patient implements Serializable {
 
     private Diagnosis dianoses;
 
-    private Boolean study;
+    private String study;
 
     private String pretherapy;
 
@@ -97,11 +97,11 @@ public class Patient implements Serializable {
         this.dianoses = dianoses;
     }
 
-    public Boolean getStudy() {
+    public String getStudy() {
         return study;
     }
 
-    public void setStudy(Boolean study) {
+    public void setStudy(String study) {
         this.study = study;
     }
 
@@ -142,4 +142,13 @@ public class Patient implements Serializable {
         map.put("Study", this.study);
         return map;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ariaID).append(" \t").append(this.lastName).append(", ").append(this.firstName).append("\t").append(this.birthday);
+        return sb.toString(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

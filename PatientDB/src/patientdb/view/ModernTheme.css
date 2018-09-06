@@ -16,6 +16,7 @@ and open the template in the editor.
 .root {
     -fx-font-family: "ClearSans";
     -fx-base: hsb(310, 4%, 24%);
+    
 }
 .Menubar {
     -fx-font-size: 13px;
@@ -37,3 +38,25 @@ and open the template in the editor.
     -fx-background-size: 150 150;
     -fx-background-opacity: .5;
 }
+
+.button {
+    -fx-focus-color: hsb(31, 82%, 66%);
+}
+
+.button:pressed, .button:focused{
+    -fx-background-color: orange;
+}
+
+.button:disabled {
+    -fx-background-opacity: .5;
+    -fx-text-color: black;
+}
+
+.text-field:disabled {
+    -fx-opacity: .2;
+}
+
+.text-field {
+    -fx-background-color: white;
+}
+

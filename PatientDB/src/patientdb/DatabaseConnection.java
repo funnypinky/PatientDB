@@ -37,7 +37,9 @@ public class DatabaseConnection {
     private int result = 0;
 
     public DatabaseConnection() {
-        boolean tableExist = false;
+        boolean patientTableExist = false;
+        boolean diagnosicTableExist = false;
+        boolean stagingTableExist = false;
         try {
             //create Data-Directory
             File path = new File(new File("data\\data.db").getParent());
@@ -48,7 +50,7 @@ public class DatabaseConnection {
 
             //Connect the Database
             con = DriverManager.getConnection(this.filePath, user, password);
-            System.out.println("Databasepath: " + this.filePath);
+            System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Databasepath: " + this.filePath);
             if (con != null) {
                 System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Connection created successfully");
                 DatabaseMetaData databaseMetaData = con.getMetaData();
@@ -56,27 +58,43 @@ public class DatabaseConnection {
                 try (ResultSet resultSet = databaseMetaData.getTables(null, null, "%", new String[]{"TABLE"})) {
                     while (resultSet.next()) {
                         String test = resultSet.getString("TABLE_NAME");
-                        if (test.equalsIgnoreCase("patientTable")) {
-                            tableExist = true;
+                        if (!patientTableExist) {
+                            patientTableExist = test.equalsIgnoreCase("patientTable");
+                        }
+                        if (!diagnosicTableExist) {
+                            diagnosicTableExist = test.equalsIgnoreCase("diagnosicTable");
+                        }
+                        if (!stagingTableExist) {
+                            stagingTableExist = test.equalsIgnoreCase("stagingTable");
                         }
                     }
                 }
                 stmt = con.createStatement();
-                if (!tableExist) {
+                if (!patientTableExist) {
                     result = stmt.executeUpdate(
                             "CREATE TABLE patientTable(ARIAID VARCHAR(50) NOT NULL,"
                             + "LASTNAME VARCHAR(75) NOT NULL,"
                             + "FIRSTNAME VARCHAR(75) NOT NULL,"
                             + "BIRTHDAY DATE,"
                             + "DEATHDAY DATE,"
-                            + "STUDY BOOLEAN,"
+                            + "STUDY VARCHAR(25),"
                             + "PRETHERAPY VARCHAR(1024),"
                             + "SEX VARCHAR(25),"
                             + "CREATEDATE TIMESTAMP,"
                             + "MODIFYDATE TIMESTAMP,"
-                            + "PRIMARY KEY (ARIAID))");
-                }
+                            + "PRIMARY KEY (ARIAID));");
+                } 
+                if (!diagnosicTableExist) {
+                    result = stmt.executeUpdate(
+                            "CREATE TABLE diagnosicTable(ARIAID VARCHAR(50) NOT NULL,"
+                            + "ICD10 VARCHAR(7) NOT NULL,"
+                            + "primaryTumor BOOLEAN,"
+                            + "rezidiv BOOLEAN,"
+                            + "preop BOOLEAN,"
+                            + "stagingKey VARCHAR(50) NOT NULL,"
+                            + "PRIMARY KEY (ARIAID));");
 
+                }
             } else {
                 System.out.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
             }
@@ -98,7 +116,7 @@ public class DatabaseConnection {
                 temp.setSex(resultSet.getString("SEX"));
                 temp.setBirthday(LocalDate.parse(resultSet.getString("BIRTHDAY")));
                 temp.setDeathDay(resultSet.getString("DEATHDAY") != null ? LocalDate.parse(resultSet.getString("DEATHDAY")) : null);
-                temp.setStudy(resultSet.getBoolean("STUDY"));
+                temp.setStudy(resultSet.getString("STUDY"));
                 temp.setPretherapy(resultSet.getString("PRETHERAPY"));
                 patientList.add(temp);
             }
@@ -203,6 +221,7 @@ public class DatabaseConnection {
 
     public void closeDB() {
         try {
+            System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Connection is closing");
             this.con.close();
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
