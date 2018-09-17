@@ -1,38 +1,19 @@
 package patientdb.data;
 
+import ICD.ICDModel;
 import java.io.Serializable;
 
 public class Staging implements Serializable {
 
     private static final long serialVersionUID = 1888945088988678635L;
 
-    private String TNM;
-
-    private String stadium;
+    private ICDModel mCode;
 
     private String grading;
 
-    private String resektion;
-
     private String size;
 
-    private String histology;
-
-    public String getTNM() {
-        return TNM;
-    }
-
-    public void setTNM(String TNM) {
-        this.TNM = TNM;
-    }
-
-    public String getStadium() {
-        return stadium;
-    }
-
-    public void setStadium(String stadium) {
-        this.stadium = stadium;
-    }
+    private String lokal;
 
     public String getGrading() {
         return grading;
@@ -40,14 +21,6 @@ public class Staging implements Serializable {
 
     public void setGrading(String grading) {
         this.grading = grading;
-    }
-
-    public String getResektion() {
-        return resektion;
-    }
-
-    public void setResektion(String resektion) {
-        this.resektion = resektion;
     }
 
     public String getSize() {
@@ -58,12 +31,21 @@ public class Staging implements Serializable {
         this.size = size;
     }
 
-    public String getHistology() {
-        return histology;
+    public ICDModel getmCode() {
+        return mCode;
     }
 
-    public void setHistology(String histology) {
-        this.histology = histology;
+    public void setmCode(ICDModel mCode) {
+        this.mCode = mCode;
     }
 
+    public String getLokal() {
+        return lokal;
+    }
+
+    public void setLokal(String lokal) {
+        this.lokal = lokal;
+    }
+
+    
 }

@@ -1,37 +1,34 @@
 package patientdb.data;
 
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-public class Patient implements Serializable {
+public class Patient extends ItemOfTree {
 
     private static final long serialVersionUID = -6641232890797160029L;
 
     private String ariaID;
 
-    private Long uniqueID;
-
     private String lastName;
 
     private String firstName;
-
-    private String surName;
 
     private LocalDate birthday;
 
     private LocalDate deathDay;
 
-    private Diagnosis dianoses;
+    private Diagnosis diagnoses;
 
     private String study;
 
-    private String pretherapy;
+    private String studyName;
 
-    private ArrayList<String> comments;
-    
+    private Boolean pretherapy;
+
     private String sex;
+    
+    private List<Series> series;
 
     public String getAriaID() {
         return ariaID;
@@ -39,14 +36,6 @@ public class Patient implements Serializable {
 
     public void setAriaID(String ariaID) {
         this.ariaID = ariaID;
-    }
-
-    public Long getUniqueID() {
-        return uniqueID;
-    }
-
-    public void setUniqueID(Long uniqueID) {
-        this.uniqueID = uniqueID;
     }
 
     public String getLastName() {
@@ -65,14 +54,6 @@ public class Patient implements Serializable {
         this.firstName = firstName;
     }
 
-    public String getSurName() {
-        return surName;
-    }
-
-    public void setSurName(String surName) {
-        this.surName = surName;
-    }
-
     public LocalDate getBirthday() {
         return birthday;
     }
@@ -89,12 +70,12 @@ public class Patient implements Serializable {
         this.deathDay = deathDay;
     }
 
-    public Diagnosis getDianoses() {
-        return dianoses;
+    public Diagnosis getDiagnose() {
+        return diagnoses;
     }
 
-    public void setDianoses(Diagnosis dianoses) {
-        this.dianoses = dianoses;
+    public void setDiagnoses(Diagnosis diagnoses) {
+        this.diagnoses = diagnoses;
     }
 
     public String getStudy() {
@@ -105,20 +86,20 @@ public class Patient implements Serializable {
         this.study = study;
     }
 
-    public String getPretherapy() {
+    public String getStudyName() {
+        return studyName;
+    }
+
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
+    }
+
+    public Boolean getPretherapy() {
         return pretherapy;
     }
 
-    public void setPretherapy(String pretherapy) {
+    public void setPretherapy(Boolean pretherapy) {
         this.pretherapy = pretherapy;
-    }
-
-    public ArrayList<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(ArrayList<String> comments) {
-        this.comments = comments;
     }
 
     public String getSex() {
@@ -129,26 +110,22 @@ public class Patient implements Serializable {
         this.sex = sex;
     }
 
-    public HashMap toMap(){
-        HashMap map = new HashMap();
-        map.put("AriaID", this.ariaID);
-        map.put("BirthDay", this.birthday);
-        map.put("DeathDay", this.deathDay);
-        map.put("FirstName", this.firstName);
-        map.put("LastName", this.lastName);
-        map.put("Sex", this.sex);
-        map.put("Study", this.study);
-        map.put("Pretherapy", this.pretherapy);
-        map.put("Study", this.study);
-        return map;
+    public List<Series> getSeries() {
+        return series;
+    }
+
+    public void setSeries(List<Series> series) {
+        this.series = series;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ariaID).append(" \t").append(this.lastName).append(", ").append(this.firstName).append("\t").append(this.birthday);
-        return sb.toString(); //To change body of generated methods, choose Tools | Templates.
+        sb.append(ariaID).append(" \t").append(this.lastName).append(", ").append(this.firstName);
+        if (this.birthday != null) {
+            sb.append("\t\t").append(this.birthday.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        }
+        return sb.toString();
     }
-    
-    
+
 }

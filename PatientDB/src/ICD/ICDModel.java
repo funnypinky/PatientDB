@@ -3,17 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ICD10;
+package ICD;
 
 /**
  *
  * @author shaesler
  */
-public class ICD10Model {
+public class ICDModel {
 
     private String code;
     private String description;
 
+    public ICDModel(String code){
+        this.code = code;
+    }
     public String getCode() {
         return code;
     }

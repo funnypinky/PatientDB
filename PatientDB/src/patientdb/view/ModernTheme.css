@@ -31,14 +31,6 @@ and open the template in the editor.
     -fx-opacity: .85;
 }
 
-.patientTable {
-    -fx-background-image: url("images/background.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-    -fx-background-size: 150 150;
-    -fx-background-opacity: .5;
-}
-
 .button {
     -fx-focus-color: hsb(31, 82%, 66%);
 }
@@ -60,3 +52,6 @@ and open the template in the editor.
     -fx-background-color: white;
 }
 
+.warning {
+    -fx-base: red;
+}

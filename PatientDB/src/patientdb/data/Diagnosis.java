@@ -1,5 +1,6 @@
 package patientdb.data;
 
+import ICD.ICDModel;
 import java.io.Serializable;
 
 public class Diagnosis implements Serializable {
@@ -8,11 +9,11 @@ public class Diagnosis implements Serializable {
 
     private Staging staging;
 
-    private String ICD10;
+    private ICDModel ICD10;
 
-    private Boolean primary;
+    private boolean primary;
 
-    private Boolean rezidiv;
+    private boolean rezidiv;
 
     private boolean preop;
 
@@ -24,27 +25,27 @@ public class Diagnosis implements Serializable {
         this.staging = staging;
     }
 
-    public String getICD10() {
+    public ICDModel getICD10() {
         return ICD10;
     }
 
-    public void setICD10(String ICD10) {
+    public void setICD10(ICDModel ICD10) {
         this.ICD10 = ICD10;
     }
 
-    public Boolean getPrimary() {
+    public boolean isPrimary() {
         return primary;
     }
 
-    public void setPrimary(Boolean primary) {
+    public void setPrimary(boolean primary) {
         this.primary = primary;
     }
 
-    public Boolean getRezidiv() {
+    public boolean isRezidiv() {
         return rezidiv;
     }
 
-    public void setRezidiv(Boolean rezidiv) {
+    public void setRezidiv(boolean rezidiv) {
         this.rezidiv = rezidiv;
     }
 

@@ -6,22 +6,29 @@
 package patientdb.data;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
  * @author shaesler
  */
-public class Series {
-    
+public class Series extends ItemOfTree {
+
     private Boolean simCT;
 
     private Boolean simRT;
-    
+
     private String complication;
-    
+
     private LocalDate therapyDate;
-    
+
+    private LocalDate inDay;
+
+    private LocalDate outDay;
+
     private String sapNumber;
+
+    private String comments;
 
     public Boolean getSimCT() {
         return simCT;
@@ -62,6 +69,34 @@ public class Series {
     public void setSapNumber(String sapNumber) {
         this.sapNumber = sapNumber;
     }
-    
-    
+
+    public LocalDate getInDay() {
+        return inDay;
+    }
+
+    public void setInDay(LocalDate inDay) {
+        this.inDay = inDay;
+    }
+
+    public LocalDate getOutDay() {
+        return outDay;
+    }
+
+    public void setOutDay(LocalDate outDay) {
+        this.outDay = outDay;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    @Override
+    public String toString() {
+        return "Fall: " + sapNumber + "\t " + this.therapyDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
 }

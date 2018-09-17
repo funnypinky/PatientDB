@@ -5,24 +5,38 @@
  */
 package patientdb.view;
 
-import ICD10.ICD10;
+import ICD.ICDCode;
+import ICD.ICDModel;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import patientdb.DatabaseConnection;
+import patientdb.data.Diagnosis;
 import patientdb.data.Patient;
+import patientdb.data.Series;
+import patientdb.data.Staging;
 
 /**
  *
@@ -31,6 +45,8 @@ import patientdb.data.Patient;
  * @TODO:2018-08-31:Druckfunktion Bericht
  * @TODO:2018-08-31:ICD-10 Katalog
  * @TODO:2018-08-31:Histologie Katalog
+ * @TODO:2018-09-07:Test ob erforderliche Eingaben gemacht wurden
+ * @TODO:2018-09-14:Test ob PatientID doppelt vergeben wird
  *
  */
 public class PatientViewController implements Initializable {
@@ -57,7 +73,7 @@ public class PatientViewController implements Initializable {
     @FXML
     private CheckBox simRTBoolean;
     @FXML
-    private ComboBox studyBoolean;
+    private ComboBox studyTF;
     @FXML
     private ComboBox gradTF;
     @FXML
@@ -96,14 +112,38 @@ public class PatientViewController implements Initializable {
     private Button saveNewPatient;
     @FXML
     private TreeView patientTable;
-    
+    @FXML
+    private ComboBox icdoTF;
+    @FXML
+    private ComboBox lokalTF;
+    @FXML
+    private Label studyLabel;
+    @FXML
+    private TextField studyNameTF;
+    @FXML
+    private TextField caseTF;
+    @FXML
+    private DatePicker outDay;
+    @FXML
+    private DatePicker inDay;
+    @FXML
+    private Button addSession;
+    @FXML
+    private Button saveSession;
+    @FXML
+    private Button abortSession;
+
     private DatabaseConnection connection = null;
 
-    private ICD10 icd10 = null;
+    private ICDCode icd10 = null;
+    private ICDCode icd3 = null;
+    private ICDCode mCode = null;
 
-    public PatientViewController(DatabaseConnection con, ICD10 icd10) {
+    public PatientViewController(DatabaseConnection con, ICDCode icd10, ICDCode icd3, ICDCode mCode) {
         this.connection = con;
         this.icd10 = icd10;
+        this.icd3 = icd3;
+        this.mCode = mCode;
     }
 
     /**
@@ -112,21 +152,38 @@ public class PatientViewController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        sexBox.getItems().addAll("Weiblich", "Männlich", "Unbestimmt");
-        sexBox.setValue("Unbestimmt");
-        studyBoolean.getItems().addAll("ja","nein","ausserhalb");
-        studyBoolean.setValue("nein");
+
         TreeItem rootItem = new TreeItem<>(new Patient());
         patientTable.setRoot(rootItem);
         patientTable.setShowRoot(false);
-        if (connection != null) {
-            connection.getPatientList().stream().forEach((patient) -> {
-                patientTable.getRoot().getChildren().add(new TreeItem<>(patient));
-                
-            });
-        }
-        tumorTF.getItems().addAll(icd10.getItems());
+
+//add Listener
         new AutoCompleteComboBoxListener(tumorTF);
+        new AutoCompleteComboBoxListener(histoTF);
+        new AutoCompleteComboBoxListener(icdoTF);
+
+        UnaryOperator<Change> rejectChange = (Change c) -> {
+            // check if the change might effect the validating predicate
+            if (c.isContentChange() && !ariaIDTF.isDisable()) {
+                // check if change is valid
+                ArrayList tempList = (ArrayList) connection.getPatientList();
+                if (tempList != null && !c.getControlNewText().isEmpty()) {
+
+                    if (patientDouble(tempList, c.getControlNewText())) {
+                        final ContextMenu menu = new ContextMenu();
+                        menu.getStyleClass().add("warning");
+                        menu.getItems().add(new MenuItem("Der Eintrag is doppelt vorhanden!"));
+                        menu.show(c.getControl(), Side.BOTTOM, 0, 0);
+                        // return null to reject the change
+                        return null;
+                    }
+                }
+            }
+            // valid change: accept the change by returning it
+            return c;
+        };
+        ariaIDTF.setTextFormatter(new TextFormatter(rejectChange));
+
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 getPatientFromList(null);
@@ -138,9 +195,36 @@ public class PatientViewController implements Initializable {
                 clearMask();
             }
         });
+
         deathTF.valueProperty().addListener((ov, oldValue, newValue) -> {
             testDeath(null);
         });
+        studyTF.valueProperty().addListener((ov, oldValue, newValue) -> {
+            showStudyName(null);
+        });
+        ariaIDTF.textProperty().addListener((ov, oldValue, newValue) -> {
+            checkRequired(null);
+        });
+        firstNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
+            checkRequired(null);
+        });
+        lastNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
+            checkRequired(null);
+        });
+        tumorTF.valueProperty().addListener((ov, oldValue, newValue) -> {
+            checkRequired(null);
+        });
+//fill elements
+        updateList();
+        tumorTF.getItems().addAll(icd10.getItems());
+        histoTF.getItems().addAll(mCode.getItems());
+        icdoTF.getItems().addAll(icd3.getItems());
+        sexBox.getItems().addAll("Weiblich", "Männlich", "Unbestimmt");
+        sexBox.setValue("Unbestimmt");
+        studyTF.getItems().addAll("ja", "nein", "ausserhalb");
+        studyTF.setValue("nein");
+        lokalTF.getItems().addAll("links", "rechts", "beidseits", "Mittellinie");
+        gradTF.getItems().addAll("G1 gut differenziert", "G2 mäßig differenziert", "G3 schlecht differenziert", "G4 undifferenziert", "GX nicht bestimmbar");
     }
 
     @FXML
@@ -150,6 +234,7 @@ public class PatientViewController implements Initializable {
         deletePatientBt.setDisable(true);
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
+        patientTable.getSelectionModel().clearSelection();
 
         this.statusCreate = true;
         //Enable Edit
@@ -188,50 +273,174 @@ public class PatientViewController implements Initializable {
     }
 
     @FXML
+    public void checkRequired(ActionEvent e) {
+        if (!ariaIDTF.getText().isEmpty()) {
+            if (!firstNameTF.getText().isEmpty()) {
+                if (!lastNameTF.getText().isEmpty()) {
+                    if (tumorTF.getValue() != null) {
+                        saveNewPatient.setDisable(false);
+                    }
+                }
+            }
+        }
+    }
+
+    @FXML
+    public void addSessionAction(ActionEvent event) {
+        changeStatusSessionPanel(true);
+        saveSession.setVisible(true);
+        abortSession.setVisible(true);
+
+        newPatientBt.setDisable(true);
+        changePatientBt.setDisable(true);
+        deletePatientBt.setDisable(true);
+
+    }
+
+    public void saveSession(ActionEvent event) {
+        Patient selectPatient;
+        TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
+        if (selectedItem.getValue().getClass() != Patient.class) {
+            selectPatient = (Patient) selectedItem.getParent().getValue();
+        } else {
+            selectPatient = (Patient) selectedItem.getValue();
+        }
+        selectPatient.setSeries(new ArrayList<>());
+        selectPatient.getSeries().add(new Series());
+        int lastIndex = selectPatient.getSeries().size() - 1;
+        selectPatient.getSeries().get(lastIndex).setSapNumber(caseTF.getText());
+        selectPatient.getSeries().get(lastIndex).setTherapyDate(this.firstHTDate.getValue());
+        selectPatient.getSeries().get(lastIndex).setInDay(this.inDay.getValue());
+        selectPatient.getSeries().get(lastIndex).setOutDay(this.outDay.getValue());
+        selectPatient.getSeries().get(lastIndex).setSimCT(this.simCTBoolean.isSelected());
+        selectPatient.getSeries().get(lastIndex).setSimRT(this.simRTBoolean.isSelected());
+        selectPatient.getSeries().get(lastIndex).setComplication(this.compilikationTA.getText());
+        selectPatient.getSeries().get(lastIndex).setComments(this.commentTA.getText());
+        if (selectedItem.getValue() instanceof Patient) {
+            selectedItem.getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
+        } else {
+            selectedItem.getParent().getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
+
+        }
+        connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex));
+        abortSessionAction(event);
+    }
+
+    @FXML
+    public void abortSessionAction(ActionEvent event) {
+        changeStatusSessionPanel(false);
+        saveSession.setVisible(false);
+        abortSession.setVisible(false);
+
+        newPatientBt.setDisable(false);
+        changePatientBt.setDisable(false);
+        deletePatientBt.setDisable(false);
+
+        caseTF.clear();
+    }
+
+    @FXML
     public void createNewPatient(ActionEvent event) {
         Patient patient = new Patient();
-        patient.setUniqueID(Math.round(Math.random() * 1000));
+        patient.setDiagnoses(new Diagnosis());
+        patient.getDiagnose().setStaging(new Staging());
+
         patient.setAriaID(ariaIDTF.getText());
         patient.setFirstName(firstNameTF.getText());
         patient.setLastName(lastNameTF.getText());
         patient.setBirthday(birthdayTF.getValue());
         patient.setDeathDay(deathTF.getValue());
         patient.setSex(sexBox.getValue().toString());
-        if (this.statusCreate) {
-            if (this.connection.addPatient(patient)) {
-                //patientTable.getItems().add(patient);
-                abortPatient(event);
-                this.statusCreate = false;
-            }
-        } else {
-            if (this.connection.updatePatient(patient, oldPatient.getAriaID())) {
-                abortPatient(event);
-                this.statusCreate = false;
-            }
+        patient.setStudy(studyTF.getValue().toString());
+        patient.setStudyName(studyNameTF.getText());
+        patient.setPretherapy(preopBoolean.isSelected());
+
+        if (tumorTF.getSelectionModel().getSelectedIndex() != -1) {
+            patient.getDiagnose().setICD10((ICDModel) tumorTF.getItems().get(tumorTF.getSelectionModel().getSelectedIndex()));
         }
+        patient.getDiagnose().setPrimary(primaryBoolean.isSelected());
+        patient.getDiagnose().setRezidiv(rezidivBoolean.isSelected());
+        patient.getDiagnose().setPreop(preopBoolean.isSelected());
+
+        if (histoTF.getSelectionModel().getSelectedIndex() != -1) {
+            patient.getDiagnose().getStaging().setmCode((ICDModel) histoTF.getItems().get(histoTF.getSelectionModel().getSelectedIndex()));
+        }
+        if (gradTF.getSelectionModel().getSelectedIndex() != -1) {
+            patient.getDiagnose().getStaging().setGrading(gradTF.getItems().get(gradTF.getSelectionModel().getSelectedIndex()).toString());
+        }
+        if (lokalTF.getSelectionModel().getSelectedIndex() != -1) {
+            patient.getDiagnose().getStaging().setLokal(lokalTF.getItems().get(lokalTF.getSelectionModel().getSelectedIndex()).toString());
+        }
+        patient.getDiagnose().getStaging().setSize(sizeTF.getText());
+
+        if (this.statusCreate) {
+            this.connection.updatePatient(patient, patient.getAriaID());
+            patientTable.getRoot().getChildren().add(patient);
+            abortPatient(event);
+            this.statusCreate = false;
+        } else {
+            this.connection.updatePatient(patient, oldPatient.getAriaID());
+            abortPatient(event);
+            this.statusCreate = false;
+        }
+        updateList();
     }
 
     @FXML
     public void getPatientFromList(ActionEvent event) {
+        clearMask();
+        addSession.setDisable(false);
+        abortSessionAction(event);
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
-        Patient selectPatient = (Patient) selectedItem.getValue();
-        if (selectPatient != null) {
-            ariaIDTF.setText(selectPatient.getAriaID());
-            firstNameTF.setText(selectPatient.getFirstName());
-            lastNameTF.setText(selectPatient.getLastName());
-            birthdayTF.setValue(selectPatient.getBirthday());
-            deathTF.setValue(selectPatient.getDeathDay());
-            sexBox.setValue(selectPatient.getSex());
+        Patient selectPatient;
+        Series selectSeries = null;
+        if (selectedItem != null) {
+            if (selectedItem.getValue() instanceof Patient) {
+                selectPatient = (Patient) selectedItem.getValue();
+            } else {
+                selectPatient = (Patient) selectedItem.getParent().getValue();
+                selectSeries = (Series) selectedItem.getValue();
+            }
+
+            if (selectPatient != null) {
+                ariaIDTF.setText(selectPatient.getAriaID());
+                firstNameTF.setText(selectPatient.getFirstName());
+                lastNameTF.setText(selectPatient.getLastName());
+                birthdayTF.setValue(selectPatient.getBirthday());
+                deathTF.setValue(selectPatient.getDeathDay());
+                sexBox.setValue(selectPatient.getSex());
+                studyTF.setValue(selectPatient.getStudy());
+                studyNameTF.setText(selectPatient.getStudyName());
+                preopBoolean.setSelected(selectPatient.getPretherapy());
+
+                if (selectPatient.getDiagnose() != null) {
+                    tumorTF.setValue(selectPatient.getDiagnose().getICD10());
+                    primaryBoolean.setSelected(selectPatient.getDiagnose().isPrimary());
+                    rezidivBoolean.setSelected(selectPatient.getDiagnose().isRezidiv());
+                    preopBoolean.setSelected(selectPatient.getDiagnose().isPreop());
+                }
+
+                if (selectPatient.getDiagnose().getStaging() != null) {
+                    histoTF.setValue(selectPatient.getDiagnose().getStaging().getmCode());
+                    gradTF.setValue(selectPatient.getDiagnose().getStaging().getGrading());
+                    sizeTF.setText(selectPatient.getDiagnose().getStaging().getSize());
+                    lokalTF.setValue(selectPatient.getDiagnose().getStaging().getLokal());
+                }
+            }
+            if (selectSeries != null) {
+                this.simCTBoolean.setSelected(selectSeries.getSimCT());
+                this.simRTBoolean.setSelected(selectSeries.getSimRT());
+                this.caseTF.setText(null);
+            }
         }
     }
 
     @FXML
     public void deletePatient(ActionEvent event) {
-        if (connection.deletePatient((Patient) patientTable.getSelectionModel().getSelectedItem())) {
-            connection.getPatientList().stream().forEach((patient) -> {
-                patientTable.getRoot().getChildren().add(new TreeItem<>(patient));
-            });
-        }
+        TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
+        Patient selectPatient = (Patient) selectedItem.getValue();
+        connection.deletePatient(selectPatient);
+        updateList();
     }
 
     @FXML
@@ -250,45 +459,73 @@ public class PatientViewController implements Initializable {
         preopBoolean.setDisable(!status);
         primaryBoolean.setDisable(!status);
         rezidivBoolean.setDisable(!status);
-        simCTBoolean.setDisable(!status);
-        simRTBoolean.setDisable(!status);
-        studyBoolean.setDisable(!status);
+        studyTF.setDisable(!status);
 
         birthdayTF.setDisable(!status);
-        birthdayTF.setEditable(status);
         deathTF.setDisable(!status);
-        deathTF.setEditable(status);
-        firstHTDate.setDisable(!status);
-        firstHTDate.setEditable(status);
-
-        commentTA.setDisable(!status);
-        compilikationTA.setDisable(!status);
 
         ariaIDTF.setDisable(!status);
-        compSessionTF.setDisable(!status);
         firstNameTF.setDisable(!status);
-        plannedSessionTF.setDisable(!status);
 
         sizeTF.setDisable(!status);
         lastNameTF.setDisable(!status);
 
-        sexBox.setEditable(status);
         sexBox.setDisable(!status);
+
+        tumorTF.setDisable(!status);
+        histoTF.setDisable(!status);
+        icdoTF.setDisable(!status);
+
+        gradTF.setDisable(!status);
+        lokalTF.setDisable(!status);
+    }
+
+    private void changeStatusSessionPanel(boolean status) {
+        inDay.setDisable(!status);
+        outDay.setDisable(!status);
+        caseTF.setDisable(!status);
+        firstHTDate.setDisable(!status);
+        commentTA.setDisable(!status);
+        compilikationTA.setDisable(!status);
+        simCTBoolean.setDisable(!status);
+        simRTBoolean.setDisable(!status);
     }
 
     private void clearMask() {
         birthdayTF.setValue(null);
         deathTF.setValue(null);
         firstHTDate.setValue(null);
+        inDay.setValue(null);
+        outDay.setValue(null);
+        caseTF.clear();
+        studyNameTF.clear();
         commentTA.clear();
         compilikationTA.clear();
         ariaIDTF.clear();
-        compSessionTF.clear();
         firstNameTF.clear();
-        plannedSessionTF.clear();
         sizeTF.clear();
         lastNameTF.clear();
         sexBox.setValue("Unbestimmt");
+        studyTF.setValue("nein");
+        tumorTF.getSelectionModel().clearSelection();
+        histoTF.getSelectionModel().clearSelection();
+        icdoTF.getSelectionModel().clearSelection();
+        gradTF.getSelectionModel().clearSelection();
+        lokalTF.getSelectionModel().clearSelection();
+        saveNewPatient.setDisable(true);
+    }
+
+    @FXML
+    public void showStudyName(ActionEvent evt) {
+        if (studyTF.getValue() != null && !studyTF.getValue().equals("nein")) {
+            studyLabel.setVisible(true);
+            studyNameTF.setVisible(true);
+            studyNameTF.setDisable(false);
+        } else {
+            studyLabel.setVisible(false);
+            studyNameTF.setVisible(false);
+            studyNameTF.setDisable(true);
+        }
     }
 
     public DatabaseConnection getConnection() {
@@ -297,9 +534,38 @@ public class PatientViewController implements Initializable {
 
     public void setConnection(DatabaseConnection connection) {
         this.connection = connection;
-        connection.getPatientList().stream().forEach((patient) -> {
-            patientTable.getRoot().getChildren().add(new TreeItem<>(patient));
-        });
+        updateList();
     }
 
+    public void updateList() {
+        if (connection != null) {
+            patientTable.getRoot().getChildren().clear();
+            connection.getPatientList().stream().forEach((Patient patient) -> {
+                TreeItem treeItem = new TreeItem<>(patient);
+                patientTable.getRoot().getChildren().add(treeItem);
+                if (patient != null && patient.getSeries() != null && !patient.getSeries().isEmpty()) {
+                    patient.getSeries().stream().forEach((serie) -> {
+                        treeItem.getChildren().add(new TreeItem<>(serie));
+                    });
+                    treeItem.setExpanded(true);
+                }
+            });
+            FXCollections.sort(patientTable.getRoot().getChildren(), (TreeItem o1, TreeItem o2) -> {
+                Patient p1 = (Patient) o1.getValue();
+                Patient p2 = (Patient) o2.getValue();
+                return p1.getLastName().compareTo(p2.getLastName());
+            });
+            
+        }
+    }
+
+    private boolean patientDouble(List<Patient> patientList, String ariaID) {
+        boolean found = false;
+        for (Patient patientItem : patientList) {
+            if (patientItem.getAriaID().equals(ariaID)) {
+                found = true;
+            }
+        }
+        return found;
+    }
 }

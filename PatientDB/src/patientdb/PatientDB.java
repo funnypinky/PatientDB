@@ -1,9 +1,11 @@
 package patientdb;
 
-import ICD10.ICD10;
+import ICD.ICDCode;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,13 +20,21 @@ public class PatientDB extends Application {
 
     private BorderPane rootLayout;
 
-    private final DatabaseConnection connection = new DatabaseConnection();
-    ICD10 icd10 = new ICD10();
+    ICDCode icd10 = new ICDCode("data\\ICD10", "[A-Z][0-9]*[.][0-9]");
+    ICDCode icd3 = new ICDCode("data\\ICD3", "[A-Z][0-9]*[.][0-9]");
+    ICDCode mCode = new ICDCode("data\\ICD3", "[0-9]*[:][0-9]*");
+    private DatabaseConnection connection;
 
     @Override
     public void start(Stage stage) throws Exception {
         System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Stage is starting");
         icd10.readFile();
+        icd3.readFile();
+        mCode.readFile();
+        for (int i = 0; i < mCode.getItems().size(); i++) {
+            mCode.getItems().get(i).setCode("M" + mCode.getItems().get(i).getCode());
+        }
+        connection = new DatabaseConnection(this.icd10, this.icd3, this.mCode);
         System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " " + icd10.getVersion());
         this.stage = stage;
         initRootPane();
@@ -52,12 +62,13 @@ public class PatientDB extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setControllerFactory(c -> {
-                return new PatientViewController(this.connection, this.icd10);
+                return new PatientViewController(this.connection, this.icd10, this.icd3, this.mCode);
             });
             loader.setLocation(this.getClass().getResource("view/patientView.fxml"));
             SplitPane patientOverview = (SplitPane) loader.load();
             rootLayout.setCenter(patientOverview);
-        } catch (IOException e) {
+        } catch (IOException ex) {
+            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
