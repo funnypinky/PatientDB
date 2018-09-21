@@ -3,6 +3,7 @@ package patientdb.data;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class Patient extends ItemOfTree {
 
@@ -27,7 +28,7 @@ public class Patient extends ItemOfTree {
     private Boolean pretherapy;
 
     private String sex;
-    
+
     private List<Series> series;
 
     public String getAriaID() {
@@ -58,6 +59,7 @@ public class Patient extends ItemOfTree {
         return birthday;
     }
 
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
@@ -66,6 +68,7 @@ public class Patient extends ItemOfTree {
         return deathDay;
     }
 
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     public void setDeathDay(LocalDate deathDay) {
         this.deathDay = deathDay;
     }

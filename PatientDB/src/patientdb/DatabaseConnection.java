@@ -476,4 +476,13 @@ public class DatabaseConnection {
         }
         return false;
     }
+
+    public Connection getCon() {
+        return con;
+    }
+
+    public Statement getStmt() {
+        return stmt;
+    }
+    
 }

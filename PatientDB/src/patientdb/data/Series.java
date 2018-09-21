@@ -7,6 +7,7 @@ package patientdb.data;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
@@ -74,6 +75,7 @@ public class Series extends ItemOfTree {
         return inDay;
     }
 
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     public void setInDay(LocalDate inDay) {
         this.inDay = inDay;
     }
@@ -82,6 +84,7 @@ public class Series extends ItemOfTree {
         return outDay;
     }
 
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     public void setOutDay(LocalDate outDay) {
         this.outDay = outDay;
     }

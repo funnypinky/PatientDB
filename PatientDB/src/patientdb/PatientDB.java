@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import patientdb.view.MainViewController;
 import patientdb.view.PatientViewController;
 
 public class PatientDB extends Application {
@@ -48,6 +49,9 @@ public class PatientDB extends Application {
     private void initRootPane() {
         try {
             FXMLLoader loader = new FXMLLoader();
+            loader.setControllerFactory(c -> {
+                return new MainViewController(this.connection);
+            });
             loader.setLocation(this.getClass().getResource("view/MainView.fxml"));
             rootLayout = (BorderPane) loader.load();
             //rootLayout.getStylesheets().add(getClass().getResource("view/ModernTheme.css").toExternalForm());
