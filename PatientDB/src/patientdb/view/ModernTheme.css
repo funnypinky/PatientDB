@@ -55,3 +55,8 @@ and open the template in the editor.
 .warning {
     -fx-base: red;
 }
+
+.test {
+    -fx-background-color: orange;
+    
+}

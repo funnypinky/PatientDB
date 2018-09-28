@@ -34,8 +34,8 @@ public class ICDCode {
     private final String KIND = "kind";
     private final List<ICDModel> items = new ArrayList<>();
     private String version;
-    private String path;
-    private String filterPattern;
+    private final String path;
+    private final String filterPattern;
 
     public ICDCode(String path, String filterPattern){
         this.path = path;

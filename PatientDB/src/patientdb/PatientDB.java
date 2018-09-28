@@ -21,9 +21,9 @@ public class PatientDB extends Application {
 
     private BorderPane rootLayout;
 
-    ICDCode icd10 = new ICDCode("data\\ICD10", "[A-Z][0-9]*[.][0-9]");
-    ICDCode icd3 = new ICDCode("data\\ICD3", "[A-Z][0-9]*[.][0-9]");
-    ICDCode mCode = new ICDCode("data\\ICD3", "[0-9]*[:][0-9]*");
+    ICDCode icd10 = new ICDCode(System.getProperty("user.dir")+"\\data\\ICD10", "[A-Z][0-9]*[.][0-9]");
+    ICDCode icd3 = new ICDCode(System.getProperty("user.dir")+"\\data\\ICD3", "[A-Z][0-9]*[.][0-9]");
+    ICDCode mCode = new ICDCode(System.getProperty("user.dir")+"\\data\\ICD3", "[0-9]*[:][0-9]*");
     private DatabaseConnection connection;
 
     @Override
@@ -74,11 +74,6 @@ public class PatientDB extends Application {
         } catch (IOException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Application started");
-        launch(args);
     }
 
     @Override

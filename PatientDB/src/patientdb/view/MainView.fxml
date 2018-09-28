@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -14,20 +15,22 @@
         <menus>
           <Menu mnemonicParsing="false" text="Datei">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Bearbeiten">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
+              <MenuItem fx:id="exitButton" mnemonicParsing="false" onAction="#exitApplication" text="Beenden">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Drucken">
                <items>
-                  <MenuItem fx:id="printReport" mnemonicParsing="false" onAction="#print" text="Drucke Bericht" />
+                  <Menu mnemonicParsing="false" text="Bericht">
+                     <items>
+                        <MenuItem fx:id="printReport" mnemonicParsing="false" onAction="#showFilterDialog" text="Krankenkasse" />
+                     </items>
+                  </Menu>
                </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="?">
+          <Menu mnemonicParsing="false" text="?" visible="false">
             <items>
               <MenuItem mnemonicParsing="false" text="About" />
             </items>

@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.UnaryOperator;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -32,6 +35,8 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import patientdb.DatabaseConnection;
 import patientdb.data.Diagnosis;
 import patientdb.data.Patient;
@@ -50,10 +55,10 @@ import patientdb.data.Staging;
  *
  */
 public class PatientViewController implements Initializable {
-
+    
     private boolean statusCreate = false;
     private Patient oldPatient;
-
+    
     @FXML
     private Button newPatientBt;
     @FXML
@@ -132,13 +137,16 @@ public class PatientViewController implements Initializable {
     private Button saveSession;
     @FXML
     private Button abortSession;
-
+    
     private DatabaseConnection connection = null;
-
+    
     private ICDCode icd10 = null;
     private ICDCode icd3 = null;
     private ICDCode mCode = null;
+    
+    Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"),16,16,false,true);
 
+    
     public PatientViewController(DatabaseConnection con, ICDCode icd10, ICDCode icd3, ICDCode mCode) {
         this.connection = con;
         this.icd10 = icd10;
@@ -152,7 +160,13 @@ public class PatientViewController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        
+        Timeline fiveSecondsWonder = new Timeline(new KeyFrame(javafx.util.Duration.seconds(5.0), (ActionEvent event) -> {
+            updateList();
+        }));
+        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+        fiveSecondsWonder.play();
+        
         TreeItem rootItem = new TreeItem<>(new Patient());
         patientTable.setRoot(rootItem);
         patientTable.setShowRoot(false);
@@ -161,14 +175,14 @@ public class PatientViewController implements Initializable {
         new AutoCompleteComboBoxListener(tumorTF);
         new AutoCompleteComboBoxListener(histoTF);
         new AutoCompleteComboBoxListener(icdoTF);
-
+        
         UnaryOperator<Change> rejectChange = (Change c) -> {
             // check if the change might effect the validating predicate
             if (c.isContentChange() && !ariaIDTF.isDisable()) {
                 // check if change is valid
                 ArrayList tempList = (ArrayList) connection.getPatientList();
                 if (tempList != null && !c.getControlNewText().isEmpty()) {
-
+                    
                     if (patientDouble(tempList, c.getControlNewText())) {
                         final ContextMenu menu = new ContextMenu();
                         menu.getStyleClass().add("warning");
@@ -183,7 +197,7 @@ public class PatientViewController implements Initializable {
             return c;
         };
         ariaIDTF.setTextFormatter(new TextFormatter(rejectChange));
-
+        
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 getPatientFromList(null);
@@ -195,24 +209,57 @@ public class PatientViewController implements Initializable {
                 clearMask();
             }
         });
-
+        
         deathTF.valueProperty().addListener((ov, oldValue, newValue) -> {
             testDeath(null);
         });
+        
         studyTF.valueProperty().addListener((ov, oldValue, newValue) -> {
             showStudyName(null);
         });
         ariaIDTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
+            if (ariaIDTF.getText().isEmpty() && !ariaIDTF.isDisable()) {
+                ariaIDTF.getStyleClass().add("test");
+            } else {
+                ariaIDTF.getStyleClass().remove("test");
+            }
+        });
+        ariaIDTF.disableProperty().addListener((ov, oldValue, newValue) -> {
+            changeCSS(ariaIDTF, !ariaIDTF.isDisable() && ariaIDTF.getText().isEmpty(), "test");
         });
         firstNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
+            if (firstNameTF.getText().isEmpty() && !firstNameTF.isDisable()) {
+                firstNameTF.getStyleClass().add("test");
+            } else {
+                firstNameTF.getStyleClass().remove("test");
+            }
+        });
+        firstNameTF.disableProperty().addListener((ov, oldValue, newValue) -> {
+            changeCSS(firstNameTF, !firstNameTF.isDisable() && firstNameTF.getText().isEmpty(), "test");
         });
         lastNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
+            if (lastNameTF.getText().isEmpty() && !lastNameTF.isDisable()) {
+                lastNameTF.getStyleClass().add("test");
+            } else {
+                lastNameTF.getStyleClass().remove("test");
+            }
+        });
+        lastNameTF.disableProperty().addListener((ov, oldValue, newValue) -> {
+            changeCSS(lastNameTF, !lastNameTF.isDisable() && lastNameTF.getText().isEmpty(), "test");
         });
         tumorTF.valueProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
+            if (tumorTF.getValue() != null && !tumorTF.isDisable()) {
+                tumorTF.getStyleClass().add("test");
+            } else {
+                tumorTF.getStyleClass().remove("test");
+            }
+        });
+        tumorTF.disableProperty().addListener((ov, oldValue, newValue) -> {
+            changeCSS(tumorTF, !tumorTF.isDisable() && tumorTF.getValue() == null, "test");
         });
 //fill elements
         updateList();
@@ -225,8 +272,9 @@ public class PatientViewController implements Initializable {
         studyTF.setValue("nein");
         lokalTF.getItems().addAll("links", "rechts", "beidseits", "Mittellinie");
         gradTF.getItems().addAll("G1 gut differenziert", "G2 mäßig differenziert", "G3 schlecht differenziert", "G4 undifferenziert", "GX nicht bestimmbar");
+        
     }
-
+    
     @FXML
     public void newPatient(ActionEvent event) {
         //Set another Button disable
@@ -235,13 +283,13 @@ public class PatientViewController implements Initializable {
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
         patientTable.getSelectionModel().clearSelection();
-
+        
         this.statusCreate = true;
         //Enable Edit
         changeEditStatus(true);
         clearMask();
     }
-
+    
     @FXML
     public void abortPatient(ActionEvent event) {
         //Set another Button disable
@@ -249,12 +297,12 @@ public class PatientViewController implements Initializable {
         deletePatientBt.setDisable(true);
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
-
+        
         changeEditStatus(false);
         clearMask();
         getPatientFromList(null);
     }
-
+    
     @FXML
     public void testDeath(ActionEvent event) {
         LocalDate today = LocalDate.now();
@@ -271,7 +319,7 @@ public class PatientViewController implements Initializable {
             }
         }
     }
-
+    
     @FXML
     public void checkRequired(ActionEvent e) {
         if (!ariaIDTF.getText().isEmpty()) {
@@ -284,19 +332,19 @@ public class PatientViewController implements Initializable {
             }
         }
     }
-
+    
     @FXML
     public void addSessionAction(ActionEvent event) {
         changeStatusSessionPanel(true);
         saveSession.setVisible(true);
         abortSession.setVisible(true);
-
+        
         newPatientBt.setDisable(true);
         changePatientBt.setDisable(true);
         deletePatientBt.setDisable(true);
-
+        
     }
-
+    
     public void saveSession(ActionEvent event) {
         Patient selectPatient;
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
@@ -320,31 +368,31 @@ public class PatientViewController implements Initializable {
             selectedItem.getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
         } else {
             selectedItem.getParent().getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
-
+            
         }
         connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex));
         abortSessionAction(event);
     }
-
+    
     @FXML
     public void abortSessionAction(ActionEvent event) {
         changeStatusSessionPanel(false);
         saveSession.setVisible(false);
         abortSession.setVisible(false);
-
+        
         newPatientBt.setDisable(false);
         changePatientBt.setDisable(false);
         deletePatientBt.setDisable(false);
-
+        
         caseTF.clear();
     }
-
+    
     @FXML
     public void createNewPatient(ActionEvent event) {
         Patient patient = new Patient();
         patient.setDiagnoses(new Diagnosis());
         patient.getDiagnose().setStaging(new Staging());
-
+        
         patient.setAriaID(ariaIDTF.getText());
         patient.setFirstName(firstNameTF.getText());
         patient.setLastName(lastNameTF.getText());
@@ -354,14 +402,14 @@ public class PatientViewController implements Initializable {
         patient.setStudy(studyTF.getValue().toString());
         patient.setStudyName(studyNameTF.getText());
         patient.setPretherapy(preopBoolean.isSelected());
-
+        
         if (tumorTF.getSelectionModel().getSelectedIndex() != -1) {
             patient.getDiagnose().setICD10((ICDModel) tumorTF.getItems().get(tumorTF.getSelectionModel().getSelectedIndex()));
         }
         patient.getDiagnose().setPrimary(primaryBoolean.isSelected());
         patient.getDiagnose().setRezidiv(rezidivBoolean.isSelected());
         patient.getDiagnose().setPreop(preopBoolean.isSelected());
-
+        
         if (histoTF.getSelectionModel().getSelectedIndex() != -1) {
             patient.getDiagnose().getStaging().setmCode((ICDModel) histoTF.getItems().get(histoTF.getSelectionModel().getSelectedIndex()));
         }
@@ -372,7 +420,7 @@ public class PatientViewController implements Initializable {
             patient.getDiagnose().getStaging().setLokal(lokalTF.getItems().get(lokalTF.getSelectionModel().getSelectedIndex()).toString());
         }
         patient.getDiagnose().getStaging().setSize(sizeTF.getText());
-
+        
         if (this.statusCreate) {
             this.connection.updatePatient(patient, patient.getAriaID());
             patientTable.getRoot().getChildren().add(patient);
@@ -385,7 +433,7 @@ public class PatientViewController implements Initializable {
         }
         updateList();
     }
-
+    
     @FXML
     public void getPatientFromList(ActionEvent event) {
         clearMask();
@@ -401,7 +449,7 @@ public class PatientViewController implements Initializable {
                 selectPatient = (Patient) selectedItem.getParent().getValue();
                 selectSeries = (Series) selectedItem.getValue();
             }
-
+            
             if (selectPatient != null) {
                 ariaIDTF.setText(selectPatient.getAriaID());
                 firstNameTF.setText(selectPatient.getFirstName());
@@ -412,14 +460,14 @@ public class PatientViewController implements Initializable {
                 studyTF.setValue(selectPatient.getStudy());
                 studyNameTF.setText(selectPatient.getStudyName());
                 preopBoolean.setSelected(selectPatient.getPretherapy());
-
+                
                 if (selectPatient.getDiagnose() != null) {
                     tumorTF.setValue(selectPatient.getDiagnose().getICD10());
                     primaryBoolean.setSelected(selectPatient.getDiagnose().isPrimary());
                     rezidivBoolean.setSelected(selectPatient.getDiagnose().isRezidiv());
                     preopBoolean.setSelected(selectPatient.getDiagnose().isPreop());
                 }
-
+                
                 if (selectPatient.getDiagnose().getStaging() != null) {
                     histoTF.setValue(selectPatient.getDiagnose().getStaging().getmCode());
                     gradTF.setValue(selectPatient.getDiagnose().getStaging().getGrading());
@@ -434,7 +482,7 @@ public class PatientViewController implements Initializable {
             }
         }
     }
-
+    
     @FXML
     public void deletePatient(ActionEvent event) {
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
@@ -442,17 +490,21 @@ public class PatientViewController implements Initializable {
         connection.deletePatient(selectPatient);
         updateList();
     }
-
+    
     @FXML
     public void changePatient(ActionEvent event) {
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
-        this.oldPatient = (Patient) selectedItem.getValue();
+        if (selectedItem.getValue() instanceof Patient) {
+            this.oldPatient = (Patient) selectedItem.getValue();
+        } else {
+            this.oldPatient = (Patient) selectedItem.getParent().getValue();
+        }
         changeEditStatus(true);
         sexBox.setValue(oldPatient.getSex());
         saveNewPatient.setVisible(!saveNewPatient.isVisible());
         abortNewPatient.setVisible(!abortNewPatient.isVisible());
     }
-
+    
     private void changeEditStatus(boolean status) {
         //Enable Edit
         definitivBoolean.setDisable(!status);
@@ -460,26 +512,26 @@ public class PatientViewController implements Initializable {
         primaryBoolean.setDisable(!status);
         rezidivBoolean.setDisable(!status);
         studyTF.setDisable(!status);
-
+        
         birthdayTF.setDisable(!status);
         deathTF.setDisable(!status);
-
+        
         ariaIDTF.setDisable(!status);
         firstNameTF.setDisable(!status);
-
+        
         sizeTF.setDisable(!status);
         lastNameTF.setDisable(!status);
-
+        
         sexBox.setDisable(!status);
-
+        
         tumorTF.setDisable(!status);
         histoTF.setDisable(!status);
         icdoTF.setDisable(!status);
-
+        
         gradTF.setDisable(!status);
         lokalTF.setDisable(!status);
     }
-
+    
     private void changeStatusSessionPanel(boolean status) {
         inDay.setDisable(!status);
         outDay.setDisable(!status);
@@ -490,7 +542,7 @@ public class PatientViewController implements Initializable {
         simCTBoolean.setDisable(!status);
         simRTBoolean.setDisable(!status);
     }
-
+    
     private void clearMask() {
         birthdayTF.setValue(null);
         deathTF.setValue(null);
@@ -514,7 +566,7 @@ public class PatientViewController implements Initializable {
         lokalTF.getSelectionModel().clearSelection();
         saveNewPatient.setDisable(true);
     }
-
+    
     @FXML
     public void showStudyName(ActionEvent evt) {
         if (studyTF.getValue() != null && !studyTF.getValue().equals("nein")) {
@@ -527,21 +579,21 @@ public class PatientViewController implements Initializable {
             studyNameTF.setDisable(true);
         }
     }
-
+    
     public DatabaseConnection getConnection() {
         return connection;
     }
-
+    
     public void setConnection(DatabaseConnection connection) {
         this.connection = connection;
         updateList();
     }
-
+    
     public void updateList() {
         if (connection != null) {
             patientTable.getRoot().getChildren().clear();
             connection.getPatientList().stream().forEach((Patient patient) -> {
-                TreeItem treeItem = new TreeItem<>(patient);
+                TreeItem treeItem = new TreeItem<>(patient,new ImageView(nodeImage));
                 patientTable.getRoot().getChildren().add(treeItem);
                 if (patient != null && patient.getSeries() != null && !patient.getSeries().isEmpty()) {
                     patient.getSeries().stream().forEach((serie) -> {
@@ -558,7 +610,7 @@ public class PatientViewController implements Initializable {
             
         }
     }
-
+    
     private boolean patientDouble(List<Patient> patientList, String ariaID) {
         boolean found = false;
         for (Patient patientItem : patientList) {
@@ -567,5 +619,13 @@ public class PatientViewController implements Initializable {
             }
         }
         return found;
+    }
+    
+    private void changeCSS(Node object, boolean addCss, String... cssElement) {
+        if (addCss) {
+            object.getStyleClass().addAll(cssElement);
+        } else {
+            object.getStyleClass().removeAll(cssElement);
+        }
     }
 }

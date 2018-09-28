@@ -41,6 +41,8 @@ public class DatabaseConnection {
     private ICDCode icd10;
     private ICDCode icd3;
     private ICDCode mCode;
+    
+    private final String userDir = System.getProperty("user.dir");
 
     public DatabaseConnection(ICDCode icd10, ICDCode icd3, ICDCode mCode) {
         this.icd10 = icd10;
@@ -52,13 +54,14 @@ public class DatabaseConnection {
         boolean sessionTableExist = false;
         try {
             //create Data-Directory
-            File path = new File(new File("data\\data.db").getParent());
+            File path = new File(new File(userDir+"\\data\\data.db").getParent());
             if (!path.exists()) {
                 path.mkdir();
             }
             this.filePath = "jdbc:hsqldb:file:" + path.getAbsolutePath() + "\\data.db";
             //Connect the Database
-            con = DriverManager.getConnection(this.filePath, user, password);
+            con = DriverManager.getConnection(this.filePath+";hsqldb.lock_file=false", user, password);
+            //con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/Patients",user,password);
             System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Databasepath: " + this.filePath);
             if (con != null) {
                 System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Connection created successfully");
@@ -82,6 +85,7 @@ public class DatabaseConnection {
                     }
                 }
                 stmt = con.createStatement();
+                stmt.execute("SET DATABASE TRANSACTION CONTROL mvcc;");
                 if (!patientTableExist) {
                     result = stmt.executeUpdate(
                             "CREATE TABLE patientTable(ARIAID VARCHAR(50) NOT NULL,"
@@ -90,7 +94,7 @@ public class DatabaseConnection {
                             + "BIRTHDAY DATE,"
                             + "DEATHDAY DATE,"
                             + "STUDY VARCHAR(25),"
-                            + "STUDYNAME VARCHAR(25),"
+                            + "STUDYNAME VARCHAR(75),"
                             + "PRETHERAPY BOOLEAN,"
                             + "SEX VARCHAR(25),"
                             + "CREATEDATE TIMESTAMP,"
@@ -305,8 +309,8 @@ public class DatabaseConnection {
         if (patient.getDiagnose().getICD10().getCode() != null) {
             sql.append(patient.getDiagnose().getICD10().getCode()).append("', ");
         }
-        sql.append(patient.getDiagnose().isPrimary()).append("', ");
-        sql.append(patient.getDiagnose().isRezidiv()).append("', ");
+        sql.append(patient.getDiagnose().isPrimary()).append(", ");
+        sql.append(patient.getDiagnose().isRezidiv()).append(", ");
         sql.append(patient.getDiagnose().isPreop()).append(");");
         System.out.println(sql);
         return sql.toString();
