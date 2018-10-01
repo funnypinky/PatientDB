@@ -159,14 +159,7 @@ public class PatientViewController implements Initializable {
      * @param resources
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        
-        Timeline fiveSecondsWonder = new Timeline(new KeyFrame(javafx.util.Duration.seconds(5.0), (ActionEvent event) -> {
-            updateList();
-        }));
-        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-        fiveSecondsWonder.play();
-        
+    public void initialize(URL location, ResourceBundle resources) {      
         TreeItem rootItem = new TreeItem<>(new Patient());
         patientTable.setRoot(rootItem);
         patientTable.setShowRoot(false);

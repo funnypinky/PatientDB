@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import patientdb.view.MainViewController;
@@ -40,10 +41,11 @@ public class PatientDB extends Application {
         this.stage = stage;
         initRootPane();
         initPatientView();
-        this.stage.setMinHeight(800.0);
+        this.stage.setMinHeight(900.0);
         this.stage.setMinWidth(1200.0);
         this.stage.show();
         this.stage.setTitle("Hyperthermie Patient Datenbank");
+        this.stage.getIcons().add(new Image(this.getClass().getResourceAsStream("view/images/favicon.png")));
     }
 
     private void initRootPane() {

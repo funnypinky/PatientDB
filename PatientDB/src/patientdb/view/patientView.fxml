@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane dividerPositions="0.2" prefWidth="944.0" stylesheets="@ModernTheme.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
+<SplitPane dividerPositions="0.2" stylesheets="@ModernTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
   <items>
     <AnchorPane minHeight="0.0" minWidth="0.0">
          <children>
@@ -31,10 +31,10 @@
             <AnchorPane>
                <children>
                   <Button fx:id="newPatientBt" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient" />
-                  <Button fx:id="changePatientBt" disable="true" layoutX="90.0" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
-                  <Button fx:id="deletePatientBt" disable="true" layoutX="184.0" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
-                  <Button fx:id="saveNewPatient" layoutX="302.0" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
-                  <Button fx:id="abortNewPatient" layoutX="371.0" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
+                  <Button fx:id="changePatientBt" disable="true" layoutX="111.0" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
+                  <Button fx:id="deletePatientBt" disable="true" layoutX="228.0" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
+                  <Button fx:id="saveNewPatient" layoutX="349.0" layoutY="-1.0" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
+                  <Button fx:id="abortNewPatient" layoutX="435.0" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
                </children>
                <padding>
                   <Insets bottom="12.5" />
@@ -44,16 +44,16 @@
                <content>
                   <GridPane layoutX="14.0" layoutY="14.0" styleClass="GridPane" stylesheets="@ModernTheme.css" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                     <columnConstraints>
-                      <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="120.0" />
-                        <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="120.0" />
+                      <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
+                        <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="77.0" minWidth="10.0" prefWidth="28.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="120.0" />
-                      <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
+                      <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="15.0" prefHeight="40.0" vgrow="NEVER" />
-                        <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="15.0" prefHeight="40.0" vgrow="NEVER" />
-                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="15.0" prefHeight="39.0" vgrow="NEVER" />
+                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                        <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
                         <Label alignment="CENTER_RIGHT" text="Patientennummer" />
@@ -76,19 +76,19 @@
                <content>
                   <GridPane styleClass="GridPane" stylesheets="@ModernTheme.css">
                     <columnConstraints>
-                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="120.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Label text="Diagnose (ICD-10)" GridPane.halignment="RIGHT" />
@@ -153,9 +153,9 @@
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <CheckBox fx:id="simCTBoolean" disable="true" mnemonicParsing="false" text="simultane Chemotherapie" />
