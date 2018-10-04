@@ -236,13 +236,13 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 				</textElement>
 				<text><![CDATA[Bericht über erfolgte Hyperthermie]]></text>
 			</staticText>
-			<textField pattern="dd.MM.yyyy">
+			<textField>
 				<reportElement stretchType="RelativeToTallestObject" x="250" y="60" width="60" height="30" uuid="79e286d4-4359-4350-9fbf-505035f2e0ea"/>
-				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{startDate}.format( java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yyyy">
+			<textField>
 				<reportElement x="330" y="60" width="134" height="30" uuid="d5eeb081-da3d-4743-abaf-d729892ab218"/>
-				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{endDate}.format( java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="140" y="60" width="110" height="30" uuid="b85de290-f8c5-43c4-9858-e7de9fea6ee5"/>

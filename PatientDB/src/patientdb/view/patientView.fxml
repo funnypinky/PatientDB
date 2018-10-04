@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
@@ -14,175 +20,210 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.2" stylesheets="@ModernTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
-  <items>
-    <AnchorPane minHeight="0.0" minWidth="0.0">
-         <children>
-            <TreeView fx:id="patientTable" prefHeight="398.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-      <VBox prefWidth="751.0">
-         <children>
-            <AnchorPane>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
+   <children>
+      <SplitPane dividerPositions="0.2" stylesheets="@ModernTheme.css">
+        <items>
+            <VBox alignment="CENTER_RIGHT">
                <children>
-                  <Button fx:id="newPatientBt" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient" />
-                  <Button fx:id="changePatientBt" disable="true" layoutX="111.0" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
-                  <Button fx:id="deletePatientBt" disable="true" layoutX="228.0" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
-                  <Button fx:id="saveNewPatient" layoutX="349.0" layoutY="-1.0" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
-                  <Button fx:id="abortNewPatient" layoutX="435.0" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="180.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="180.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="180.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <TextField fx:id="filterPatientNumber" styleClass="filter-field" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </TextField>
+                        <TextField fx:id="filterFirstName" styleClass="filter-field" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </TextField>
+                        <TextField fx:id="filterLastName" styleClass="filter-field" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </TextField>
+                        <Label text="Patientennummer" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <Label text="Vorname" GridPane.columnIndex="2" GridPane.valignment="CENTER">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <Label text="Nachname" GridPane.columnIndex="1">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </GridPane>
+                  <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="SOMETIMES">
+                     <content>
+                        <TreeView fx:id="patientTable" />
+                     </content>
+                  </ScrollPane>
+                  <Label fx:id="filterSummary" alignment="CENTER_RIGHT" contentDisplay="TOP" text="3 von 500 Patient angezeigt" />
                </children>
-               <padding>
-                  <Insets bottom="12.5" />
-               </padding>
-            </AnchorPane>
-            <TitledPane fx:id="demography" text="Demografie">
-               <content>
-                  <GridPane layoutX="14.0" layoutY="14.0" styleClass="GridPane" stylesheets="@ModernTheme.css" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
-                    <columnConstraints>
-                      <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
-                        <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
-                        <ColumnConstraints hgrow="NEVER" maxWidth="77.0" minWidth="10.0" prefWidth="28.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
-                      <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
-                        <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
-                      <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
-                    </rowConstraints>
+            </VBox>
+            <VBox prefWidth="751.0">
+               <children>
+                  <FlowPane prefHeight="0.0" prefWidth="923.0">
                      <children>
-                        <Label alignment="CENTER_RIGHT" text="Patientennummer" />
-                        <TextField fx:id="ariaIDTF" disable="true" GridPane.columnIndex="1" />
-                        <TextField fx:id="lastNameTF" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <TextField fx:id="firstNameTF" disable="true" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-                        <Label text="Nachname" GridPane.rowIndex="2" />
-                        <Label text="Vorname" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                        <Label text="Geburtsdatum" GridPane.columnIndex="3" />
-                        <DatePicker fx:id="birthdayTF" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="4" />
-                        <Label text="Sterbedatum" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <DatePicker fx:id="deathTF" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <Label alignment="CENTER_RIGHT" text="Geschlecht" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="sexBox" disable="true" prefWidth="150.0" styleClass="comboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Button fx:id="newPatientBt" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient" />
+                        <Button fx:id="changePatientBt" disable="true" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
+                        <Button fx:id="deletePatientBt" disable="true" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
+                        <Button fx:id="saveNewPatient" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
+                        <Button fx:id="abortNewPatient" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
                      </children>
-                  </GridPane>
-               </content>
-            </TitledPane>
-          <TitledPane fx:id="diagnose" text="Diagnose">
-               <content>
-                  <GridPane styleClass="GridPane" stylesheets="@ModernTheme.css">
-                    <columnConstraints>
-                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Diagnose (ICD-10)" GridPane.halignment="RIGHT" />
-                        <CheckBox fx:id="primaryBoolean" alignment="CENTER_RIGHT" disable="true" mnemonicParsing="false" text="Primärtumor" textAlignment="RIGHT" GridPane.rowIndex="1" />
-                        <CheckBox fx:id="rezidivBoolean" disable="true" mnemonicParsing="false" text="Rezidiv" GridPane.rowIndex="2" />
-                        <CheckBox fx:id="preopBoolean" disable="true" mnemonicParsing="false" text="Pre-OP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="tumorTF" disable="true" prefWidth="150.0" GridPane.columnIndex="1" />
-                        <Label text="Histologie (M-Code)" GridPane.columnIndex="2" />
-                        <Label text="Grad" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label text="Lokalisation (ICD-O)" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                        <ComboBox fx:id="icdoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <ComboBox fx:id="histoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" />
-                        <ComboBox fx:id="gradTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <Label layoutX="383.0" layoutY="87.0" text="Größe" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                        <TextField fx:id="sizeTF" disable="true" promptText="Höhe x Breite x Tiefe" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="definitivBoolean" disable="true" mnemonicParsing="false" text="definitiv" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label text="Studienteilnahme" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                        <ComboBox fx:id="studyTF" disable="true" editable="true" prefWidth="150.0" visibleRowCount="3" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                        <ComboBox fx:id="lokalTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                        <Label fx:id="studyLabel" text="Studie" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                        <TextField fx:id="studyNameTF" disable="true" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </GridPane>
-               </content>
-            </TitledPane>
-            <TitledPane prefHeight="351.0" prefWidth="672.0" text="Therapie">
-               <content>
-                  <VBox prefWidth="749.0">
-                     <children>
-                        <HBox>
-                           <children>
-                              <Button fx:id="addSession" disable="true" mnemonicParsing="false" onAction="#addSessionAction" text="Neue Sitzung">
-                                 <HBox.margin>
-                                    <Insets right="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="saveSession" mnemonicParsing="false" onAction="#saveSession" text="Speichern" visible="false">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="abortSession" mnemonicParsing="false" onAction="#abortSessionAction" text="Abbrechen" visible="false">
-                                 <HBox.margin>
-                                    <Insets right="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                        </HBox>
-                        <Separator halignment="LEFT" VBox.vgrow="ALWAYS">
-                           <VBox.margin>
-                              <Insets bottom="12.0" top="12.0" />
-                           </VBox.margin>
-                        </Separator>
-                        <GridPane prefWidth="670.0" styleClass="GridPane">
+                  </FlowPane>
+                  <Separator halignment="LEFT" />
+                  <TitledPane fx:id="demography" text="Demografie">
+                     <content>
+                        <GridPane layoutX="14.0" layoutY="14.0" styleClass="GridPane" stylesheets="@ModernTheme.css" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
+                              <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
+                              <ColumnConstraints hgrow="NEVER" maxWidth="77.0" minWidth="10.0" prefWidth="28.0" />
+                              <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
+                            <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="140.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                            <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                              <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                            <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
                           </rowConstraints>
                            <children>
-                              <CheckBox fx:id="simCTBoolean" disable="true" mnemonicParsing="false" text="simultane Chemotherapie" />
-                              <CheckBox fx:id="simRTBoolean" disable="true" mnemonicParsing="false" text="simultane Strahlentherapie" GridPane.columnIndex="1" />
-                              <Label text="Sitzungsdatum" GridPane.columnIndex="2" />
-                              <DatePicker fx:id="firstHTDate" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" />
-                              <Label text="Aufnahmedatum" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Label text="Fallnummer" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                              <Label text="Entlassungsdatum" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                              <DatePicker fx:id="inDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <DatePicker fx:id="outDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                              <TextField fx:id="caseTF" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label alignment="CENTER_RIGHT" text="Patientennummer" />
+                              <TextField fx:id="ariaIDTF" disable="true" GridPane.columnIndex="1" />
+                              <TextField fx:id="lastNameTF" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="firstNameTF" disable="true" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                              <Label text="Nachname" GridPane.rowIndex="2" />
+                              <Label text="Vorname" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <Label text="Geburtsdatum" GridPane.columnIndex="3" />
+                              <DatePicker fx:id="birthdayTF" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="4" />
+                              <Label text="Sterbedatum" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <DatePicker fx:id="deathTF" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                              <Label alignment="CENTER_RIGHT" text="Geschlecht" GridPane.rowIndex="1" />
+                              <ComboBox fx:id="sexBox" disable="true" prefWidth="150.0" styleClass="comboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
-                        <Label text="Komplikationen" />
-                        <TextArea fx:id="compilikationTA" disable="true" prefHeight="120.0">
-                           <VBox.margin>
-                              <Insets top="2.0" />
-                           </VBox.margin>
-                        </TextArea>
-                        <Label text="Bemerkung" />
-                        <TextArea fx:id="commentTA" disable="true" prefHeight="120.0" />
-                     </children>
-                  </VBox>
-               </content>
-            </TitledPane>
-         </children>
-      </VBox>
-  </items>
-</SplitPane>
+                     </content>
+                  </TitledPane>
+                <TitledPane fx:id="diagnose" text="Diagnose">
+                     <content>
+                        <GridPane styleClass="GridPane" stylesheets="@ModernTheme.css">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                              <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Diagnose (ICD-10)" GridPane.halignment="RIGHT" />
+                              <CheckBox fx:id="primaryBoolean" alignment="CENTER_RIGHT" disable="true" mnemonicParsing="false" text="Primärtumor" textAlignment="RIGHT" GridPane.rowIndex="1" />
+                              <CheckBox fx:id="rezidivBoolean" disable="true" mnemonicParsing="false" text="Rezidiv" GridPane.rowIndex="2" />
+                              <CheckBox fx:id="preopBoolean" disable="true" mnemonicParsing="false" text="Pre-OP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <ComboBox fx:id="tumorTF" disable="true" prefWidth="150.0" GridPane.columnIndex="1" />
+                              <Label text="Histologie (M-Code)" GridPane.columnIndex="2" />
+                              <Label text="Grad" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Label text="Lokalisation (ICD-O)" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                              <ComboBox fx:id="icdoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ComboBox fx:id="histoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" />
+                              <ComboBox fx:id="gradTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <Label layoutX="383.0" layoutY="87.0" text="Größe" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                              <TextField fx:id="sizeTF" disable="true" promptText="Höhe x Breite x Tiefe" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                              <CheckBox fx:id="definitivBoolean" disable="true" mnemonicParsing="false" text="definitiv" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Studienteilnahme" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="studyTF" disable="true" editable="true" prefWidth="150.0" visibleRowCount="3" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <ComboBox fx:id="lokalTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                              <Label fx:id="studyLabel" text="Studie" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <TextField fx:id="studyNameTF" disable="true" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </GridPane>
+                     </content>
+                  </TitledPane>
+                  <TitledPane prefHeight="351.0" prefWidth="672.0" text="Therapie">
+                     <content>
+                        <VBox prefWidth="749.0">
+                           <children>
+                              <FlowPane>
+                                 <children>
+                                    <Button fx:id="addSession" disable="true" mnemonicParsing="false" onAction="#addSessionAction" text="Neue Sitzung" />
+                                    <Button fx:id="saveSession" mnemonicParsing="false" onAction="#saveSession" text="Speichern" visible="false" />
+                                    <Button fx:id="abortSession" mnemonicParsing="false" onAction="#abortSessionAction" text="Abbrechen" visible="false" />
+                                 </children>
+                              </FlowPane>
+                              <Separator halignment="LEFT" />
+                              <GridPane prefWidth="670.0" styleClass="GridPane">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="-Infinity" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <CheckBox fx:id="simCTBoolean" disable="true" mnemonicParsing="false" text="simultane Chemotherapie" />
+                                    <CheckBox fx:id="simRTBoolean" disable="true" mnemonicParsing="false" text="simultane Strahlentherapie" GridPane.columnIndex="1" />
+                                    <Label text="Sitzungsdatum" GridPane.columnIndex="2" />
+                                    <DatePicker fx:id="firstHTDate" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" />
+                                    <Label text="Aufnahmedatum" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Label text="Fallnummer" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                                    <Label text="Entlassungsdatum" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <DatePicker fx:id="inDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                    <DatePicker fx:id="outDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    <TextField fx:id="caseTF" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 </children>
+                              </GridPane>
+                              <Label text="Komplikationen" />
+                              <TextArea fx:id="compilikationTA" disable="true" prefHeight="120.0">
+                                 <VBox.margin>
+                                    <Insets top="2.0" />
+                                 </VBox.margin>
+                              </TextArea>
+                              <Label text="Bemerkung" />
+                              <TextArea fx:id="commentTA" disable="true" prefHeight="120.0" />
+                           </children>
+                        </VBox>
+                     </content>
+                  </TitledPane>
+               </children>
+            </VBox>
+        </items>
+      </SplitPane>
+   </children>
+</VBox>

@@ -12,9 +12,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -137,6 +137,14 @@ public class PatientViewController implements Initializable {
     private Button saveSession;
     @FXML
     private Button abortSession;
+    @FXML
+    private TextField filterLastName;
+    @FXML
+    private TextField filterFirstName;
+    @FXML
+    private TextField filterPatientNumber;
+    @FXML
+    private Label filterSummary;
     
     private DatabaseConnection connection = null;
     
@@ -144,8 +152,9 @@ public class PatientViewController implements Initializable {
     private ICDCode icd3 = null;
     private ICDCode mCode = null;
     
-    Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"),16,16,false,true);
-
+    private final Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"), 18, 18, false, true);
+    private final Image newPatientImage = new Image(getClass().getResourceAsStream("images/newPatient.png"), 18, 18, false, true);
+    private final Image deletePatientImage = new Image(getClass().getResourceAsStream("images/deletePatient.png"), 18, 18, false, true);
     
     public PatientViewController(DatabaseConnection con, ICDCode icd10, ICDCode icd3, ICDCode mCode) {
         this.connection = con;
@@ -159,7 +168,7 @@ public class PatientViewController implements Initializable {
      * @param resources
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {      
+    public void initialize(URL location, ResourceBundle resources) {
         TreeItem rootItem = new TreeItem<>(new Patient());
         patientTable.setRoot(rootItem);
         patientTable.setShowRoot(false);
@@ -179,7 +188,7 @@ public class PatientViewController implements Initializable {
                     if (patientDouble(tempList, c.getControlNewText())) {
                         final ContextMenu menu = new ContextMenu();
                         menu.getStyleClass().add("warning");
-                        menu.getItems().add(new MenuItem("Der Eintrag is doppelt vorhanden!"));
+                        menu.getItems().add(new MenuItem("Der Eintrag ist doppelt vorhanden!"));
                         menu.show(c.getControl(), Side.BOTTOM, 0, 0);
                         // return null to reject the change
                         return null;
@@ -254,6 +263,18 @@ public class PatientViewController implements Initializable {
         tumorTF.disableProperty().addListener((ov, oldValue, newValue) -> {
             changeCSS(tumorTF, !tumorTF.isDisable() && tumorTF.getValue() == null, "test");
         });
+        filterFirstName.textProperty().addListener((ov, oldValue, newValue) -> {
+            filterList(new ActionEvent());
+        });
+        filterLastName.textProperty().addListener((ov, oldValue, newValue) -> {
+            filterList(new ActionEvent());
+        });
+        filterPatientNumber.textProperty().addListener((ov, oldValue, newValue) -> {
+            filterList(new ActionEvent());
+        });
+        newPatientBt.setGraphic(new ImageView(newPatientImage));
+        deletePatientBt.setGraphic(new ImageView(deletePatientImage));
+        
 //fill elements
         updateList();
         tumorTF.getItems().addAll(icd10.getItems());
@@ -273,8 +294,8 @@ public class PatientViewController implements Initializable {
         //Set another Button disable
         changePatientBt.setDisable(true);
         deletePatientBt.setDisable(true);
-        saveNewPatient.setVisible(!saveNewPatient.isVisible());
-        abortNewPatient.setVisible(!abortNewPatient.isVisible());
+        saveNewPatient.setVisible(true);
+        abortNewPatient.setVisible(true);
         patientTable.getSelectionModel().clearSelection();
         
         this.statusCreate = true;
@@ -471,7 +492,12 @@ public class PatientViewController implements Initializable {
             if (selectSeries != null) {
                 this.simCTBoolean.setSelected(selectSeries.getSimCT());
                 this.simRTBoolean.setSelected(selectSeries.getSimRT());
-                this.caseTF.setText(null);
+                this.caseTF.setText(selectSeries.getSapNumber());
+                this.firstHTDate.setValue(selectSeries.getTherapyDate());
+                this.inDay.setValue(selectSeries.getInDay());
+                this.outDay.setValue(selectSeries.getOutDay());
+                this.compilikationTA.setText(selectSeries.getComplication());
+                this.commentTA.setText(selectSeries.getComments());
             }
         }
     }
@@ -584,24 +610,42 @@ public class PatientViewController implements Initializable {
     
     public void updateList() {
         if (connection != null) {
-            patientTable.getRoot().getChildren().clear();
-            connection.getPatientList().stream().forEach((Patient patient) -> {
-                TreeItem treeItem = new TreeItem<>(patient,new ImageView(nodeImage));
-                patientTable.getRoot().getChildren().add(treeItem);
-                if (patient != null && patient.getSeries() != null && !patient.getSeries().isEmpty()) {
-                    patient.getSeries().stream().forEach((serie) -> {
-                        treeItem.getChildren().add(new TreeItem<>(serie));
-                    });
-                    treeItem.setExpanded(true);
-                }
-            });
-            FXCollections.sort(patientTable.getRoot().getChildren(), (TreeItem o1, TreeItem o2) -> {
-                Patient p1 = (Patient) o1.getValue();
-                Patient p2 = (Patient) o2.getValue();
-                return p1.getLastName().compareTo(p2.getLastName());
-            });
-            
+            updateList(connection.getPatientList());
         }
+    }
+    
+    public void updateList(List<Patient> patients) {
+        patientTable.getRoot().getChildren().clear();
+        patients.stream().forEach((Patient patient) -> {
+            TreeItem treeItem = new TreeItem<>(patient, new ImageView(nodeImage));
+            patientTable.getRoot().getChildren().add(treeItem);
+            if (patient != null && patient.getSeries() != null && !patient.getSeries().isEmpty()) {
+                patient.getSeries().stream().forEach((serie) -> {
+                    treeItem.getChildren().add(new TreeItem<>(serie));
+                });
+                treeItem.setExpanded(true);
+            }
+        });
+        FXCollections.sort(patientTable.getRoot().getChildren(), (TreeItem o1, TreeItem o2) -> {
+            Patient p1 = (Patient) o1.getValue();
+            Patient p2 = (Patient) o2.getValue();
+            return p1.getLastName().compareTo(p2.getLastName());
+        });
+        
+        filterSummary.setText(patients.size() + " von " + connection.getPatientList().size() + " Patienten angezeigt");
+    }
+    
+    public void filterList(ActionEvent ev) {
+        List<Patient> temp = connection.getPatientList();
+        List<Patient> result = temp.stream().filter(new Predicate<Patient>() {
+            @Override
+            public boolean test(Patient s) {
+                return s.getFirstName().toLowerCase().startsWith(filterFirstName.getText().toLowerCase())
+                        && s.getLastName().toLowerCase().startsWith(filterLastName.getText().toLowerCase())
+                        && s.getAriaID().toLowerCase().startsWith(filterPatientNumber.getText().toLowerCase());
+            }
+        }).collect(Collectors.toList());
+        updateList(result);
     }
     
     private boolean patientDouble(List<Patient> patientList, String ariaID) {
@@ -612,6 +656,7 @@ public class PatientViewController implements Initializable {
             }
         }
         return found;
+        
     }
     
     private void changeCSS(Node object, boolean addCss, String... cssElement) {

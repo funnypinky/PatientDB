@@ -1,0 +1,39 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 04.10.2018, 13:55:18
+    Author     : shaesler
+*/
+
+
+.root {
+    -fx-background-image: url('background.jpg');
+    -fx-base: hsb(310, 4%, 24%);
+
+}
+.progress-bar {
+    -fx-background-radius: 0, 0, 0, 0;
+    -fx-padding: 0.10em;
+    -fx-pref-height: .1;
+    -fx-max-height: .1;
+}
+
+.progress-bar .track{
+    -fx-background-insets: 0;
+    -fx-background-radius: 0, 0, 0, 0;
+    -fx-opacity: 0;
+}
+
+.progress-bar .bar { 
+    -fx-background-insets: 0; 
+    -fx-background-radius: 0;
+    -fx-padding: 0.10em;
+    -fx-background-color: hsb(47.9, 48.95%, 66.9%);
+}
+
+.label {
+    -fx-font-size: 8pt;
+}
