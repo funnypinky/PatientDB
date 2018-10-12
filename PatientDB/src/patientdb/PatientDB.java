@@ -4,6 +4,7 @@ import ICD.ICDCode;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -26,6 +27,7 @@ public class PatientDB extends Application {
 
     private BorderPane rootLayout;
 
+    Timer timerRefresh = new Timer("Refresh Datasource");
 
     ICDCode icd10 = new ICDCode(System.getProperty("user.dir") + "\\data\\ICD10", "[A-Z][0-9]*[.][0-9]");
     ICDCode icd3 = new ICDCode(System.getProperty("user.dir") + "\\data\\ICD3", "[A-Z][0-9]*[.][0-9]");
@@ -36,23 +38,23 @@ public class PatientDB extends Application {
 
     @Override
     public void init() throws Exception {
-        notifyPreloader(new CustomPreloadNotification(1.0/5.0, "...lade ICD-10 Katalog-Datei"));
+        notifyPreloader(new CustomPreloadNotification(1.0 / 5.0, "...lade ICD-10 Katalog-Datei"));
         icd10.readFile();
-        notifyPreloader(new CustomPreloadNotification(2.0/5.0, "...lade ICD-3 Katalog-Datei"));
+        notifyPreloader(new CustomPreloadNotification(2.0 / 5.0, "...lade ICD-3 Katalog-Datei"));
         icd3.readFile();
-        notifyPreloader(new CustomPreloadNotification(3.0/5.0, "...lade Histologie Katalog-Datei"));
+        notifyPreloader(new CustomPreloadNotification(3.0 / 5.0, "...lade Histologie Katalog-Datei"));
         mCode.readFile();
-        notifyPreloader(new CustomPreloadNotification(4.0/5.0, "...lade Histologie Katalog-Datei"));
+        notifyPreloader(new CustomPreloadNotification(4.0 / 5.0, "...lade Histologie Katalog-Datei"));
         for (int i = 0; i < mCode.getItems().size(); i++) {
             mCode.getItems().get(i).setCode("M" + mCode.getItems().get(i).getCode());
         }
-        notifyPreloader(new CustomPreloadNotification(5.0/5.0, "...stelle Verbindung zur Datenbank her"));
+        notifyPreloader(new CustomPreloadNotification(5.0 / 5.0, "...stelle Verbindung zur Datenbank her"));
         connection = new DatabaseConnection(this.icd10, this.icd3, this.mCode);
         ready.setValue(Boolean.TRUE);
 
         notifyPreloader(new StateChangeNotification(
                 StateChangeNotification.Type.BEFORE_START));
-                
+
     }
 
     @Override
@@ -102,6 +104,8 @@ public class PatientDB extends Application {
     @Override
     public void stop() {
         this.connection.closeDB();
+        this.timerRefresh.cancel();
+        this.timerRefresh.purge();
         System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Stage is closing");
     }
 

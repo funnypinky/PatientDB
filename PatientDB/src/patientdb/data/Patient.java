@@ -3,6 +3,7 @@ package patientdb.data;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class Patient extends ItemOfTree {
@@ -131,4 +132,26 @@ public class Patient extends ItemOfTree {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Patient)) {
+            return false;
+        }
+        if (o == null) {
+            return false;
+        }
+
+        if (o == this) {
+            return true;
+        }
+        Patient pat = (Patient) o;
+        return this.ariaID.contentEquals(pat.ariaID);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 79 * hash + Objects.hashCode(this.ariaID);
+        return hash;
+    }
 }

@@ -3,6 +3,7 @@
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
@@ -18,6 +19,8 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
@@ -28,6 +31,46 @@
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
    <children>
+      <FlowPane>
+         <children>
+            <Button fx:id="refreshBt" contentDisplay="TOP" mnemonicParsing="false" onAction="#updateList" text="Aktualisieren">
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/refresh.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="newPatientBt" contentDisplay="TOP" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient">
+               <graphic>
+                  <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/newPatient.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="changePatientBt" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern">
+               <graphic>
+                  <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/changePatient.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="deletePatientBt" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen">
+               <graphic>
+                  <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/deletePatient.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </FlowPane>
       <SplitPane dividerPositions="0.2" stylesheets="@ModernTheme.css">
         <items>
             <VBox alignment="CENTER_RIGHT">
@@ -87,11 +130,8 @@
                <children>
                   <FlowPane prefHeight="0.0" prefWidth="923.0">
                      <children>
-                        <Button fx:id="newPatientBt" mnemonicParsing="false" onAction="#newPatient" text="Neuer Patient" />
-                        <Button fx:id="changePatientBt" disable="true" mnemonicParsing="false" onAction="#changePatient" text="Patient ändern" />
-                        <Button fx:id="deletePatientBt" disable="true" mnemonicParsing="false" onAction="#deletePatient" text="Patient löschen" />
                         <Button fx:id="saveNewPatient" mnemonicParsing="false" onAction="#createNewPatient" text="Speichern" visible="false" />
-                        <Button fx:id="abortNewPatient" mnemonicParsing="false" onAction="#abortPatient" text="Abbrechen" visible="false" />
+                        <Button fx:id="abortNewPatient" mnemonicParsing="false" onAction="#abortPatientAction" text="Abbrechen" visible="false" />
                      </children>
                   </FlowPane>
                   <Separator halignment="LEFT" />
@@ -157,7 +197,7 @@
                               <ComboBox fx:id="icdoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                               <ComboBox fx:id="histoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" />
                               <ComboBox fx:id="gradTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <Label layoutX="383.0" layoutY="87.0" text="Größe" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                              <Label layoutX="383.0" layoutY="87.0" text="Größe [cm]" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                               <TextField fx:id="sizeTF" disable="true" promptText="Höhe x Breite x Tiefe" GridPane.columnIndex="3" GridPane.rowIndex="4" />
                               <CheckBox fx:id="definitivBoolean" disable="true" mnemonicParsing="false" text="definitiv" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="Studienteilnahme" GridPane.columnIndex="2" GridPane.rowIndex="2" />

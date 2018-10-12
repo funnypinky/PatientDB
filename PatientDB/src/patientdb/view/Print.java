@@ -6,14 +6,10 @@
 package patientdb.view;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.stage.Window;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -31,53 +27,42 @@ public class Print {
     private JasperReport jasperReport;
     private JasperPrint jasperPrint;
 
+    private WorkIndicatorDialog wd = null;
+
     private final DatabaseConnection connection;
+
+    private Window owner;
 
     public Print(DatabaseConnection connection) {
         this.connection = connection;
     }
 
     public void print(HashMap<String, Object> parameters) {
-        try {
-            File path = new File("printtemplates\\krankenkasse.jrxml");
-            jasperReport = JasperCompileManager.compileReport(path.getAbsolutePath());
-            jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, this.connection.getCon());
+
+        wd = new WorkIndicatorDialog(this.owner, "Bereite Bericht vor...");
+        wd.addTaskEndNotification((Object result) -> {            
             JasperViewer jv = new JasperViewer(jasperPrint, false);
-
             jv.setVisible(true);
-
-        } catch (JRException ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Fehler im Report erzeugen");
-            alert.setContentText("Fehler im erzeugen des Report, bitte Details prüfen.");
-
-            // Create expandable Exception.
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            ex.printStackTrace(pw);
-            String exceptionText = sw.toString();
-
-            Label label = new Label("The exception stacktrace was:");
-
-            TextArea textArea = new TextArea(exceptionText);
-            textArea.setEditable(false);
-            textArea.setWrapText(true);
-
-            textArea.setMaxWidth(Double.MAX_VALUE);
-            textArea.setMaxHeight(Double.MAX_VALUE);
-            GridPane.setVgrow(textArea, Priority.ALWAYS);
-            GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-            GridPane expContent = new GridPane();
-            expContent.setMaxWidth(Double.MAX_VALUE);
-            expContent.add(label, 0, 0);
-            expContent.add(textArea, 0, 1);
-
-// Set expandable Exception into the dialog pane.
-            alert.getDialogPane().setExpandableContent(expContent);
-
-            alert.showAndWait();
-        }
-
+            wd = null; // don't keep the object, cleanup
+        });
+        wd.exec(null, inputParam -> {
+            File path = new File("printtemplates\\krankenkasse.jrxml");
+            try {
+                jasperReport = JasperCompileManager.compileReport(path.getAbsolutePath());
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, this.connection.getCon());
+            } catch (JRException ex) {
+                Logger.getLogger(Print.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return 1;
+        });
     }
+
+    public Window getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Window owner) {
+        this.owner = owner;
+    }
+    
 }

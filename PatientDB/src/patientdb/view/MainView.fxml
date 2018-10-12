@@ -11,14 +11,15 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@ModernTheme.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.MainViewController">
    <top>
-      <MenuBar styleClass="Menubar" stylesheets="@ModernTheme.css" BorderPane.alignment="CENTER">
+      <MenuBar fx:id="myMenuBar" styleClass="Menubar" stylesheets="@ModernTheme.css" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="Datei">
             <items>
               <MenuItem fx:id="exitButton" mnemonicParsing="false" onAction="#exitApplication" text="Beenden">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
+                     </accelerator>
+                  </MenuItem>
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Drucken">
@@ -39,4 +40,4 @@
       </MenuBar>
    </top>
 
-</BorderPane>
+            </BorderPane>

@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
@@ -41,7 +42,12 @@ public class DatabaseConnection {
     private ICDCode icd10;
     private ICDCode icd3;
     private ICDCode mCode;
-    
+
+    private static final String TN_PATIENT = "patientTable";
+    private static final String TN_DIAGNOSIC = "diagnosicTable";
+    private static final String TN_STAGING = "stagingTable";
+    private static final String TN_SESSION = "sessionTable";
+
     private final String userDir = System.getProperty("user.dir");
 
     public DatabaseConnection(ICDCode icd10, ICDCode icd3, ICDCode mCode) {
@@ -54,13 +60,16 @@ public class DatabaseConnection {
         boolean sessionTableExist = false;
         try {
             //create Data-Directory
-            File path = new File(new File(userDir+"\\data\\data.db").getParent());
+            File path = new File(new File(userDir + "\\data\\data.db").getParent());
             if (!path.exists()) {
                 path.mkdir();
             }
+            Properties p = new Properties();
+            p.setProperty("sa", "");
+            p.setProperty("useUnicode", "true");
             this.filePath = "jdbc:hsqldb:file:" + path.getAbsolutePath() + "\\data.db";
             //Connect the Database
-            con = DriverManager.getConnection(this.filePath+";hsqldb.lock_file=false", user, password);
+            con = DriverManager.getConnection(this.filePath + ";hsqldb.lock_file=false", p);
             //con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/Patients",user,password);
             System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Databasepath: " + this.filePath);
             if (con != null) {
@@ -88,7 +97,7 @@ public class DatabaseConnection {
                 stmt.execute("SET DATABASE TRANSACTION CONTROL mvcc;");
                 if (!patientTableExist) {
                     result = stmt.executeUpdate(
-                            "CREATE TABLE patientTable(ARIAID VARCHAR(50) NOT NULL,"
+                            "CREATE TABLE " + TN_PATIENT + " (ARIAID VARCHAR(50) NOT NULL,"
                             + "LASTNAME VARCHAR(75) NOT NULL,"
                             + "FIRSTNAME VARCHAR(75) NOT NULL,"
                             + "BIRTHDAY DATE,"
@@ -100,10 +109,11 @@ public class DatabaseConnection {
                             + "CREATEDATE TIMESTAMP,"
                             + "MODIFYDATE TIMESTAMP,"
                             + "PRIMARY KEY (ARIAID));");
+
                 }
                 if (!diagnosicTableExist) {
                     result = stmt.executeUpdate(
-                            "CREATE TABLE diagnosicTable(ARIAID VARCHAR(50) NOT NULL,"
+                            "CREATE TABLE " + TN_DIAGNOSIC + " (ARIAID VARCHAR(50) NOT NULL,"
                             + "ICD10 VARCHAR(7) NOT NULL,"
                             + "primaryTumor BOOLEAN,"
                             + "rezidiv BOOLEAN,"
@@ -112,11 +122,10 @@ public class DatabaseConnection {
                             + "FOREIGN KEY(ARIAID) REFERENCES patienttable (ARIAID) "
                             + "ON UPDATE CASCADE "
                             + "ON DELETE CASCADE);");
-
                 }
                 if (!stagingTableExist) {
                     result = stmt.executeUpdate(
-                            "CREATE TABLE stagingTable(ARIAID VARCHAR(50) NOT NULL,"
+                            "CREATE TABLE " + TN_STAGING + "(ARIAID VARCHAR(50) NOT NULL,"
                             + "mCode VARCHAR(7),"
                             + "grad VARCHAR(25),"
                             + "size VARCHAR(25),"
@@ -125,11 +134,10 @@ public class DatabaseConnection {
                             + "FOREIGN KEY(ARIAID) REFERENCES diagnosictable (ARIAID) "
                             + "ON UPDATE CASCADE "
                             + "ON DELETE CASCADE);");
-
                 }
                 if (!sessionTableExist) {
                     result = stmt.executeUpdate(
-                            "CREATE TABLE sessionTable(ARIAID VARCHAR(50) NOT NULL,"
+                            "CREATE TABLE " + TN_SESSION + " (ARIAID VARCHAR(50) NOT NULL,"
                             + "simChemo boolean,"
                             + "simRT boolean,"
                             + "sessionDate DATE,"
@@ -142,7 +150,6 @@ public class DatabaseConnection {
                             + "FOREIGN KEY(ARIAID) REFERENCES diagnosictable (ARIAID) "
                             + "ON UPDATE CASCADE "
                             + "ON DELETE CASCADE);");
-
                 }
             } else {
                 System.out.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
@@ -180,7 +187,7 @@ public class DatabaseConnection {
                 }
                 while (resultStaging.next()) {
                     temp.getDiagnose().setStaging((new Staging()));
-                    temp.getDiagnose().getStaging().setmCode(mCode.getItem(resultStaging.getString("mCode")));
+                    temp.getDiagnose().getStaging().setmCode(resultStaging.getString("mCode") != null ? mCode.getItem(resultStaging.getString("mCode")) : null);
                     temp.getDiagnose().getStaging().setGrading(resultStaging.getString("GRAD"));
                     temp.getDiagnose().getStaging().setSize(resultStaging.getString("SIZE"));
                     temp.getDiagnose().getStaging().setLokal(resultStaging.getString("LOKAL"));
@@ -209,17 +216,18 @@ public class DatabaseConnection {
         try {
             if (patient.getAriaID() != null && patient.getFirstName() != null && patient.getLastName() != null) {
 
-                if (rowCount("patientTable", patient.getAriaID()) <= 0) {
+                if (rowCount("patientTable", oldAriaID) <= 0) {
                     stmt.executeUpdate(sqlInsertPatient(patient));
                 } else {
                     stmt.executeUpdate(sqlUpdatePatient(patient, oldAriaID));
+                    oldAriaID = patient.getAriaID();
                 }
-                if (rowCount("diagnosicTable", patient.getAriaID()) <= 0) {
+                if (rowCount("diagnosicTable", oldAriaID) <= 0) {
                     stmt.executeUpdate(sqlInsertDiagnosic(patient));
                 } else {
                     stmt.executeUpdate(sqlUpdateDiagnosic(patient, oldAriaID));
                 }
-                if (rowCount("stagingTable", patient.getAriaID()) <= 0) {
+                if (rowCount("stagingTable", oldAriaID) <= 0) {
                     stmt.executeUpdate(sqlInsertStaging(patient));
                 } else {
                     stmt.executeUpdate(sqlUpdateStaging(patient, oldAriaID));
@@ -294,7 +302,6 @@ public class DatabaseConnection {
             sql.append("'").append(patient.getStudyName()).append("',");
         }
         sql.append("CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);");
-        System.out.println(sql);
         return sql.toString();
     }
 
@@ -312,7 +319,7 @@ public class DatabaseConnection {
         sql.append(patient.getDiagnose().isPrimary()).append(", ");
         sql.append(patient.getDiagnose().isRezidiv()).append(", ");
         sql.append(patient.getDiagnose().isPreop()).append(");");
-        System.out.println(sql);
+
         return sql.toString();
     }
 
@@ -346,7 +353,7 @@ public class DatabaseConnection {
             sql.append(",'").append(patient.getDiagnose().getStaging().getLokal()).append("'");
         }
         sql.append(");");
-        System.out.println(sql);
+
         return sql.toString();
     }
 
@@ -386,7 +393,7 @@ public class DatabaseConnection {
         sql.append(",").append("REZIDIV =").append(patient.getDiagnose().isRezidiv());
         sql.append(",").append("PREOP =").append(patient.getDiagnose().isPreop());
         sql.append(" WHERE ARIAID ='").append(ariaID).append("';");
-        System.out.println(sql);
+
         return sql.toString();
     }
 
@@ -406,7 +413,7 @@ public class DatabaseConnection {
             sql.append(",").append("lokal ='").append(patient.getDiagnose().getStaging().getLokal()).append("'");
         }
         sql.append(" WHERE ARIAID ='").append(ariaID).append("';");
-        System.out.println(sql);
+
         return sql.toString();
     }
 
@@ -455,7 +462,7 @@ public class DatabaseConnection {
                 sql.append(",'").append(session.getComplication()).append("'");
             }
             sql.append(");");
-            System.out.println(sql);
+
             stmt.executeUpdate(sql.toString());
 
         } catch (SQLException ex) {
@@ -488,5 +495,5 @@ public class DatabaseConnection {
     public Statement getStmt() {
         return stmt;
     }
-    
+
 }

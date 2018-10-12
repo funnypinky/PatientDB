@@ -37,11 +37,11 @@ public class ICDCode {
     private final String path;
     private final String filterPattern;
 
-    public ICDCode(String path, String filterPattern){
+    public ICDCode(String path, String filterPattern) {
         this.path = path;
         this.filterPattern = filterPattern;
     }
-    
+
     /**
      * @TODO XML-File import ändern, so dass nur geschaut wird nach einer
      * XML-Datei
@@ -96,6 +96,6 @@ public class ICDCode {
                 index = i;
             }
         }
-        return items.get(index);
+        return index != -1 ? items.get(index) : null;
     }
 }

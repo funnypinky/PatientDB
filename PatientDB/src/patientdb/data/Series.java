@@ -7,6 +7,7 @@ package patientdb.data;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -101,5 +102,26 @@ public class Series extends ItemOfTree {
     public String toString() {
         return "Fall: " + sapNumber + "\t " + this.therapyDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
+@Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Series)) {
+            return false;
+        }
+        if (o == null) {
+            return false;
+        }
 
+        if (o == this) {
+            return true;
+        }
+        Series pat = (Series) o;
+        return this.sapNumber.contentEquals(pat.sapNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + Objects.hashCode(this.sapNumber);
+        return hash;
+    }
 }

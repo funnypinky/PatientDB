@@ -17,7 +17,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import patientdb.DatabaseConnection;
 
@@ -32,6 +34,9 @@ public class MainViewController implements Initializable {
 
     @FXML
     private MenuItem exitButton;
+    
+    @FXML
+    private MenuBar myMenuBar;
 
     Dialog aboutDialog = new Dialog();
 
@@ -55,6 +60,7 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void showFilterDialog(ActionEvent event) throws IOException {
+        this.printJob.setOwner((Stage) myMenuBar.getScene().getWindow());
         FXMLLoader loader = new FXMLLoader();
         loader.setControllerFactory(c -> {
             return new FilterController(this);
@@ -76,7 +82,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    public void exitApplication(ActionEvent event){
+    public void exitApplication(ActionEvent event) {
         Platform.exit();
     }
 }
