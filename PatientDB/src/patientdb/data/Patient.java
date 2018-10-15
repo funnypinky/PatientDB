@@ -125,9 +125,10 @@ public class Patient extends ItemOfTree {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ariaID).append(" \t").append(this.lastName).append(", ").append(this.firstName);
+        String name = this.lastName+", "+this.firstName;
+        sb.append(String.format("%12s\t",ariaID)).append(String.format("%-32s", name));
         if (this.birthday != null) {
-            sb.append("\t\t").append(this.birthday.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            sb.append(String.format("%10s", this.birthday.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
         }
         return sb.toString();
     }
@@ -137,10 +138,6 @@ public class Patient extends ItemOfTree {
         if (!(o instanceof Patient)) {
             return false;
         }
-        if (o == null) {
-            return false;
-        }
-
         if (o == this) {
             return true;
         }

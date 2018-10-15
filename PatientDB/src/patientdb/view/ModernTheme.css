@@ -56,9 +56,11 @@ and open the template in the editor.
     -fx-base: red;
 }
 
-.test {
+.required-textfield {
     -fx-background-color: orange;
-    
+}
+.required-textfield .text-field {
+    -fx-background-color: orange;
 }
 .filter-field {
     -fx-background-radius: 0;

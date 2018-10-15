@@ -155,6 +155,8 @@ public class PatientViewController implements Initializable {
     private ICDCode mCode = null;
 
     private final Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"), 18, 18, false, true);
+    
+    private final String CSSRequiredTextfield = "required-textfield";
 
     public PatientViewController(DatabaseConnection con, ICDCode icd10, ICDCode icd3, ICDCode mCode) {
         this.connection = con;
@@ -225,46 +227,46 @@ public class PatientViewController implements Initializable {
         ariaIDTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
             if (ariaIDTF.getText().isEmpty() && !ariaIDTF.isDisable()) {
-                ariaIDTF.getStyleClass().add("test");
+                ariaIDTF.getStyleClass().add(CSSRequiredTextfield);
             } else {
-                ariaIDTF.getStyleClass().remove("test");
+                ariaIDTF.getStyleClass().remove(CSSRequiredTextfield);
             }
         });
         ariaIDTF.disableProperty().addListener((ov, oldValue, newValue) -> {
-            changeCSS(ariaIDTF, !ariaIDTF.isDisable() && ariaIDTF.getText().isEmpty(), "test");
+            changeCSS(ariaIDTF, !ariaIDTF.isDisable() && ariaIDTF.getText().isEmpty(), CSSRequiredTextfield);
         });
         firstNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
             if (firstNameTF.getText().isEmpty() && !firstNameTF.isDisable()) {
-                firstNameTF.getStyleClass().add("test");
+                firstNameTF.getStyleClass().add(CSSRequiredTextfield);
             } else {
-                firstNameTF.getStyleClass().remove("test");
+                firstNameTF.getStyleClass().remove(CSSRequiredTextfield);
             }
         });
         firstNameTF.disableProperty().addListener((ov, oldValue, newValue) -> {
-            changeCSS(firstNameTF, !firstNameTF.isDisable() && firstNameTF.getText().isEmpty(), "test");
+            changeCSS(firstNameTF, !firstNameTF.isDisable() && firstNameTF.getText().isEmpty(), CSSRequiredTextfield);
         });
         lastNameTF.textProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
             if (lastNameTF.getText().isEmpty() && !lastNameTF.isDisable()) {
-                lastNameTF.getStyleClass().add("test");
+                lastNameTF.getStyleClass().add(CSSRequiredTextfield);
             } else {
-                lastNameTF.getStyleClass().remove("test");
+                lastNameTF.getStyleClass().remove(CSSRequiredTextfield);
             }
         });
         lastNameTF.disableProperty().addListener((ov, oldValue, newValue) -> {
-            changeCSS(lastNameTF, !lastNameTF.isDisable() && lastNameTF.getText().isEmpty(), "test");
+            changeCSS(lastNameTF, !lastNameTF.isDisable() && lastNameTF.getText().isEmpty(), CSSRequiredTextfield);
         });
         tumorTF.valueProperty().addListener((ov, oldValue, newValue) -> {
             checkRequired(null);
-            if (tumorTF.getValue() != null && !tumorTF.isDisable()) {
-                tumorTF.getStyleClass().add("test");
+            if (tumorTF.getValue() == null && !tumorTF.isDisable()) {
+                tumorTF.getStyleClass().add(CSSRequiredTextfield);
             } else {
-                tumorTF.getStyleClass().remove("test");
+                tumorTF.getStyleClass().remove(CSSRequiredTextfield);
             }
         });
         tumorTF.disableProperty().addListener((ov, oldValue, newValue) -> {
-            changeCSS(tumorTF, !tumorTF.isDisable() && tumorTF.getValue() == null, "test");
+            changeCSS(tumorTF, !tumorTF.isDisable() && tumorTF.getValue() == null, CSSRequiredTextfield);
         });
         filterFirstName.textProperty().addListener((ov, oldValue, newValue) -> {
             filterList(new ActionEvent());
@@ -615,7 +617,7 @@ public class PatientViewController implements Initializable {
         primaryBoolean.selectedProperty().set(false);
         rezidivBoolean.selectedProperty().set(false);
         
-        tumorTF.getSelectionModel().clearSelection();
+        tumorTF.setValue(null);
         histoTF.getSelectionModel().clearSelection();
         icdoTF.getSelectionModel().clearSelection();
         gradTF.getSelectionModel().clearSelection();
