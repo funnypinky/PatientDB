@@ -118,6 +118,7 @@ public class DatabaseConnection {
                             + "primaryTumor BOOLEAN,"
                             + "rezidiv BOOLEAN,"
                             + "preop BOOLEAN,"
+                            + "postop BOOLEAN,"
                             + "PRIMARY KEY (ARIAID),"
                             + "FOREIGN KEY(ARIAID) REFERENCES patienttable (ARIAID) "
                             + "ON UPDATE CASCADE "
@@ -182,6 +183,7 @@ public class DatabaseConnection {
                     temp.setDiagnoses(new Diagnosis());
                     temp.getDiagnose().setICD10(icd10.getItem(resultDiagnosic.getString("ICD10")));
                     temp.getDiagnose().setPreop(resultDiagnosic.getBoolean("PREOP"));
+                    temp.getDiagnose().setPostop(resultDiagnosic.getBoolean("POSTOP"));
                     temp.getDiagnose().setPrimary(resultDiagnosic.getBoolean("PRIMARYTUMOR"));
                     temp.getDiagnose().setRezidiv(resultDiagnosic.getBoolean("REZIDIV"));
                 }
@@ -310,6 +312,7 @@ public class DatabaseConnection {
         sql.append("ARIAID, ICD10");
         sql.append(" ,PRIMARYTUMOR");
         sql.append(" ,REZIDIV");
+        sql.append(" ,POSTOP");
         sql.append(" ,PREOP");
         sql.append(") VALUES ('");
         sql.append(patient.getAriaID()).append("', '");
@@ -318,6 +321,7 @@ public class DatabaseConnection {
         }
         sql.append(patient.getDiagnose().isPrimary()).append(", ");
         sql.append(patient.getDiagnose().isRezidiv()).append(", ");
+        sql.append(patient.getDiagnose().isPostop()).append(", ");
         sql.append(patient.getDiagnose().isPreop()).append(");");
 
         return sql.toString();
@@ -392,6 +396,7 @@ public class DatabaseConnection {
         sql.append(",").append("PRIMARYTUMOR =").append(patient.getDiagnose().isPrimary());
         sql.append(",").append("REZIDIV =").append(patient.getDiagnose().isRezidiv());
         sql.append(",").append("PREOP =").append(patient.getDiagnose().isPreop());
+        sql.append(",").append("POSTOP =").append(patient.getDiagnose().isPostop());
         sql.append(" WHERE ARIAID ='").append(ariaID).append("';");
 
         return sql.toString();

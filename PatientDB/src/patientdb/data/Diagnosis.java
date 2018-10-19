@@ -16,6 +16,8 @@ public class Diagnosis implements Serializable {
     private boolean rezidiv;
 
     private boolean preop;
+    
+    private boolean postop;
 
     public Staging getStaging() {
         return staging;
@@ -57,4 +59,13 @@ public class Diagnosis implements Serializable {
         this.preop = preop;
     }
 
+    public boolean isPostop() {
+        return postop;
+    }
+
+    public void setPostop(boolean postop) {
+        this.postop = postop;
+    }
+
+    
 }

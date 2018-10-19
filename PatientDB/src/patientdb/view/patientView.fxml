@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -29,7 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
+<VBox xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
    <children>
       <FlowPane>
          <children>
@@ -199,12 +193,13 @@
                               <ComboBox fx:id="gradTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                               <Label layoutX="383.0" layoutY="87.0" text="Größe [cm]" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                               <TextField fx:id="sizeTF" disable="true" promptText="Höhe x Breite x Tiefe" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                              <CheckBox fx:id="definitivBoolean" disable="true" mnemonicParsing="false" text="definitiv" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <CheckBox fx:id="definitivBoolean" disable="true" mnemonicParsing="false" text="definitiv" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                               <Label text="Studienteilnahme" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                               <ComboBox fx:id="studyTF" disable="true" editable="true" prefWidth="150.0" visibleRowCount="3" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                               <ComboBox fx:id="lokalTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                               <Label fx:id="studyLabel" text="Studie" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                               <TextField fx:id="studyNameTF" disable="true" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                              <CheckBox fx:id="postopBoolean" disable="true" mnemonicParsing="false" text="Post-OP" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                            <opaqueInsets>
                               <Insets />

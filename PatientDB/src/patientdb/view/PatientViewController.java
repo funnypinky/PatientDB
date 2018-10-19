@@ -70,6 +70,8 @@ public class PatientViewController implements Initializable {
     @FXML
     private CheckBox preopBoolean;
     @FXML
+    private CheckBox postopBoolean;
+    @FXML
     private CheckBox primaryBoolean;
     @FXML
     private CheckBox rezidivBoolean;
@@ -98,11 +100,7 @@ public class PatientViewController implements Initializable {
     @FXML
     private TextField ariaIDTF;
     @FXML
-    private TextField compSessionTF;
-    @FXML
     private TextField lastNameTF;
-    @FXML
-    private TextField plannedSessionTF;
     @FXML
     private TextField sizeTF;
     @FXML
@@ -155,7 +153,7 @@ public class PatientViewController implements Initializable {
     private ICDCode mCode = null;
 
     private final Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"), 18, 18, false, true);
-    
+
     private final String CSSRequiredTextfield = "required-textfield";
 
     public PatientViewController(DatabaseConnection con, ICDCode icd10, ICDCode icd3, ICDCode mCode) {
@@ -277,14 +275,24 @@ public class PatientViewController implements Initializable {
         filterPatientNumber.textProperty().addListener((ov, oldValue, newValue) -> {
             filterList(new ActionEvent());
         });
-        primaryBoolean.selectedProperty().addListener((ov,oldValue,newValue)->{
-            if(newValue){
+        primaryBoolean.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue) {
                 rezidivBoolean.selectedProperty().set(false);
             }
         });
-        rezidivBoolean.selectedProperty().addListener((ov,oldValue,newValue)->{
-            if(newValue){
+        rezidivBoolean.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue) {
                 primaryBoolean.selectedProperty().set(false);
+            }
+        });
+        preopBoolean.selectedProperty().addListener((ov, oldValue, newValue)->{
+            if(newValue){
+                postopBoolean.selectedProperty().set(false);
+            }
+        });
+        postopBoolean.selectedProperty().addListener((ov, oldValue, newValue)->{
+            if(newValue){
+                preopBoolean.selectedProperty().set(false);
             }
         });
 
@@ -324,16 +332,15 @@ public class PatientViewController implements Initializable {
         //Set another Button disable
         changePatientBt.setDisable(true);
         deletePatientBt.setDisable(true);
-        saveNewPatient.setVisible(!saveNewPatient.isVisible());
-        abortNewPatient.setVisible(!abortNewPatient.isVisible());
+        saveNewPatient.setVisible(false);
+        abortNewPatient.setVisible(false);
 
         changeEditStatus(false);
         clearMask();
         //getPatientFromList(null);
         changeCSS(newPatientBt, false, "button-active");
         changeCSS(newPatientBt, false, "button-active");
-        
-        
+
     }
 
     @FXML
@@ -407,7 +414,7 @@ public class PatientViewController implements Initializable {
         }
         connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex));
         abortSessionAction(event);
-        
+
     }
 
     @FXML
@@ -446,6 +453,7 @@ public class PatientViewController implements Initializable {
         patient.getDiagnose().setPrimary(primaryBoolean.isSelected());
         patient.getDiagnose().setRezidiv(rezidivBoolean.isSelected());
         patient.getDiagnose().setPreop(preopBoolean.isSelected());
+        patient.getDiagnose().setPostop(postopBoolean.isSelected());
 
         if (histoTF.getSelectionModel().getSelectedIndex() != -1) {
             patient.getDiagnose().getStaging().setmCode((ICDModel) histoTF.getItems().get(histoTF.getSelectionModel().getSelectedIndex()));
@@ -502,6 +510,7 @@ public class PatientViewController implements Initializable {
                     primaryBoolean.setSelected(selectPatient.getDiagnose().isPrimary());
                     rezidivBoolean.setSelected(selectPatient.getDiagnose().isRezidiv());
                     preopBoolean.setSelected(selectPatient.getDiagnose().isPreop());
+                    postopBoolean.setSelected(selectPatient.getDiagnose().isPostop());
                 }
 
                 if (selectPatient.getDiagnose().getStaging() != null) {
@@ -542,8 +551,8 @@ public class PatientViewController implements Initializable {
         }
         changeEditStatus(true);
         sexBox.setValue(oldPatient.getSex());
-        saveNewPatient.setVisible(!saveNewPatient.isVisible());
-        abortNewPatient.setVisible(!abortNewPatient.isVisible());
+        saveNewPatient.setVisible(true);
+        abortNewPatient.setVisible(true);
         changeCSS(changePatientBt, false, "button-active");
     }
 
@@ -551,6 +560,7 @@ public class PatientViewController implements Initializable {
         //Enable Edit
         definitivBoolean.setDisable(!status);
         preopBoolean.setDisable(!status);
+        postopBoolean.setDisable(!status);
         primaryBoolean.setDisable(!status);
         rezidivBoolean.setDisable(!status);
         studyTF.setDisable(!status);
@@ -614,9 +624,10 @@ public class PatientViewController implements Initializable {
         studyTF.setValue("nein");
         definitivBoolean.selectedProperty().set(false);
         preopBoolean.selectedProperty().set(false);
+        postopBoolean.selectedProperty().set(false);
         primaryBoolean.selectedProperty().set(false);
         rezidivBoolean.selectedProperty().set(false);
-        
+
         tumorTF.setValue(null);
         histoTF.getSelectionModel().clearSelection();
         icdoTF.getSelectionModel().clearSelection();
