@@ -61,6 +61,7 @@ public class DatabaseConnection {
         try {
             //create Data-Directory
             File path = new File(new File(userDir + "\\data\\data.db").getParent());
+            System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Datapath: " + path.getAbsolutePath());
             if (!path.exists()) {
                 path.mkdir();
             }
@@ -153,7 +154,7 @@ public class DatabaseConnection {
                             + "ON DELETE CASCADE);");
                 }
             } else {
-                System.out.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
+                System.err.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
             }
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
@@ -234,6 +235,12 @@ public class DatabaseConnection {
                 } else {
                     stmt.executeUpdate(sqlUpdateStaging(patient, oldAriaID));
                 }
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Speichern erfolgreich!");
+                alert.setHeaderText(null);
+                alert.setContentText("Die Daten wurden erfolgreich gespeichert!");
+
+                alert.showAndWait();
             }
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
@@ -422,7 +429,7 @@ public class DatabaseConnection {
         return sql.toString();
     }
 
-    public void sqlInsertSession(String ariaID, Series session) {
+    public boolean sqlInsertSession(String ariaID, Series session) {
         try {
             StringBuilder sql = new StringBuilder("INSERT INTO sessiontable (");
             sql.append("ARIAID, simChemo, simRT");
@@ -468,11 +475,12 @@ public class DatabaseConnection {
             }
             sql.append(");");
 
-            stmt.executeUpdate(sql.toString());
+            return stmt.executeUpdate(sql.toString()) > 0;
 
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return false;
     }
 
     public void closeDB() {

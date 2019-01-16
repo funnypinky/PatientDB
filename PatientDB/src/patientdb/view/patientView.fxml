@@ -187,8 +187,8 @@
                               <ComboBox fx:id="tumorTF" disable="true" prefWidth="150.0" GridPane.columnIndex="1" />
                               <Label text="Histologie (M-Code)" GridPane.columnIndex="2" />
                               <Label text="Grad" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Label text="Lokalisation (ICD-O)" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                              <ComboBox fx:id="icdoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Lokalisation" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                              <ComboBox fx:id="icdoTF" disable="true" editable="true" prefWidth="150.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                               <ComboBox fx:id="histoTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" />
                               <ComboBox fx:id="gradTF" disable="true" editable="true" prefWidth="150.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                               <Label layoutX="383.0" layoutY="87.0" text="Größe [cm]" GridPane.columnIndex="2" GridPane.rowIndex="4" />

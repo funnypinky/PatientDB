@@ -10,9 +10,10 @@ import ICD.ICDModel;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
@@ -22,11 +23,14 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
@@ -46,12 +50,18 @@ import patientdb.data.Staging;
 /**
  *
  * @author shaesler
- * @TODO:2018-08-30:Therapie-Daten einbindung in die Datenbank
- * @TODO:2018-08-31:Druckfunktion Bericht
- * @TODO:2018-08-31:ICD-10 Katalog
- * @TODO:2018-08-31:Histologie Katalog
- * @TODO:2018-09-07:Test ob erforderliche Eingaben gemacht wurden
- * @TODO:2018-09-14:Test ob PatientID doppelt vergeben wird
+ * @TODO:2018-08-30:Therapie-Daten einbindung in die Datenbank - done
+ * @TODO:2018-08-31:Druckfunktion Bericht - done
+ * @TODO:2018-08-31:ICD-10 Katalog - done
+ * @TODO:2018-08-31:Histologie Katalog -done
+ * @TODO:2018-09-07:Test ob erforderliche Eingaben gemacht wurden -done
+ * @TODO:2018-09-14:Test ob PatientID doppelt vergeben wird -done
+ * @TODO:2019-01-15:Fall sortieren - nach Datum -done
+ * @TODO:2019-01-15:Sitzungsdaten ändern
+ * @TODO:2019-01-15:Dialog "Speichern ok" -done
+ * @TODO:2019-01-15:Dialog "Speichern abbrechen" -done
+ * @TODO:2019-01-15:ICD-O Eintrag bei Patientenwechseln aktuallieren -> ICD-O
+ * ComboBox removed, while unused
  *
  */
 public class PatientViewController implements Initializable {
@@ -176,7 +186,7 @@ public class PatientViewController implements Initializable {
 //add Listener
         new AutoCompleteComboBoxListener(tumorTF);
         new AutoCompleteComboBoxListener(histoTF);
-        new AutoCompleteComboBoxListener(icdoTF);
+        //new AutoCompleteComboBoxListener(icdoTF); //not used
 
         UnaryOperator<Change> rejectChange = (Change c) -> {
             // check if the change might effect the validating predicate
@@ -202,8 +212,8 @@ public class PatientViewController implements Initializable {
 
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                abortPatientAction(null);
-                abortSessionAction(null);
+                clearPatient();
+                clearSession();
                 getPatientFromList(null);
                 changePatientBt.setDisable(false);
                 deletePatientBt.setDisable(false);
@@ -285,13 +295,13 @@ public class PatientViewController implements Initializable {
                 primaryBoolean.selectedProperty().set(false);
             }
         });
-        preopBoolean.selectedProperty().addListener((ov, oldValue, newValue)->{
-            if(newValue){
+        preopBoolean.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue) {
                 postopBoolean.selectedProperty().set(false);
             }
         });
-        postopBoolean.selectedProperty().addListener((ov, oldValue, newValue)->{
-            if(newValue){
+        postopBoolean.selectedProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue) {
                 preopBoolean.selectedProperty().set(false);
             }
         });
@@ -300,7 +310,7 @@ public class PatientViewController implements Initializable {
         updateList();
         tumorTF.getItems().addAll(icd10.getItems());
         histoTF.getItems().addAll(mCode.getItems());
-        icdoTF.getItems().addAll(icd3.getItems());
+        //icdoTF.getItems().addAll(icd3.getItems());
         sexBox.getItems().addAll("Weiblich", "Männlich", "Unbestimmt");
         sexBox.setValue("Unbestimmt");
         studyTF.getItems().addAll("ja", "nein", "ausserhalb");
@@ -329,9 +339,19 @@ public class PatientViewController implements Initializable {
 
     @FXML
     public void abortPatientAction(ActionEvent event) {
-        //Set another Button disable
-        changePatientBt.setDisable(true);
-        deletePatientBt.setDisable(true);
+        Object oldSelection = patientTable.getSelectionModel().getSelectedItem();
+        if (confirmAbort()) {
+            patientTable.getSelectionModel().select(oldSelection);
+            patientTable.requestFocus();
+            clearPatient();
+            getPatientFromList(null);
+        }
+
+    }
+
+    public void clearPatient() {
+
+//Set another Button disable
         saveNewPatient.setVisible(false);
         abortNewPatient.setVisible(false);
 
@@ -340,7 +360,6 @@ public class PatientViewController implements Initializable {
         //getPatientFromList(null);
         changeCSS(newPatientBt, false, "button-active");
         changeCSS(newPatientBt, false, "button-active");
-
     }
 
     @FXML
@@ -412,13 +431,27 @@ public class PatientViewController implements Initializable {
             selectedItem.getParent().getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
 
         }
-        connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex));
-        abortSessionAction(event);
+        if (connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex))) {
+            showConfirmDialog();
+        } else {
+            showErrorDialog();
+        }
+        clearSession();
 
     }
 
+    /**
+     * TODO: Clear Action
+     */
     @FXML
     public void abortSessionAction(ActionEvent event) {
+        if (confirmAbort()) {
+            clearSession();
+            getPatientFromList(null);
+        }
+    }
+
+    public void clearSession() {
         changeStatusSessionPanel(false);
         saveSession.setVisible(false);
         abortSession.setVisible(false);
@@ -429,6 +462,7 @@ public class PatientViewController implements Initializable {
 
         caseTF.clear();
         changeCSS(addSession, false, "button-active");
+
     }
 
     @FXML
@@ -468,11 +502,11 @@ public class PatientViewController implements Initializable {
 
         if (this.statusCreate) {
             this.connection.updatePatient(patient, patient.getAriaID());
-            abortPatientAction(event);
+            clearPatient();
             this.statusCreate = false;
         } else {
             this.connection.updatePatient(patient, oldPatient.getAriaID());
-            abortPatientAction(event);
+            clearPatient();
             this.statusCreate = false;
         }
         updateList();
@@ -482,7 +516,7 @@ public class PatientViewController implements Initializable {
     public void getPatientFromList(ActionEvent event) {
         clearMask();
         addSession.setDisable(false);
-        abortSessionAction(event);
+        clearSession();
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
         Patient selectPatient;
         Series selectSeries = null;
@@ -578,7 +612,7 @@ public class PatientViewController implements Initializable {
 
         tumorTF.setDisable(!status);
         histoTF.setDisable(!status);
-        icdoTF.setDisable(!status);
+        //icdoTF.setDisable(!status);
 
         gradTF.setDisable(!status);
         lokalTF.setDisable(!status);
@@ -630,7 +664,7 @@ public class PatientViewController implements Initializable {
 
         tumorTF.setValue(null);
         histoTF.getSelectionModel().clearSelection();
-        icdoTF.getSelectionModel().clearSelection();
+        //icdoTF.getSelectionModel().clearSelection();
         gradTF.getSelectionModel().clearSelection();
         lokalTF.getSelectionModel().clearSelection();
         saveNewPatient.setDisable(true);
@@ -670,7 +704,7 @@ public class PatientViewController implements Initializable {
             TreeItem treeItem = new TreeItem<>(patient, new ImageView(nodeImage));
             patientTable.getRoot().getChildren().add(treeItem);
             if (patient != null && patient.getSeries() != null && !patient.getSeries().isEmpty()) {
-                patient.getSeries().stream().forEach((serie) -> {
+                patient.getSeries().stream().sorted(Comparator.comparing(Series::getTherapyDate)).forEach((serie) -> {
                     treeItem.getChildren().add(new TreeItem<>(serie));
                 });
                 treeItem.setExpanded(true);
@@ -686,14 +720,9 @@ public class PatientViewController implements Initializable {
 
     public void filterList(ActionEvent ev) {
         List<Patient> temp = connection.getPatientList();
-        List<Patient> result = temp.stream().filter(new Predicate<Patient>() {
-            @Override
-            public boolean test(Patient s) {
-                return s.getFirstName().toLowerCase().startsWith(filterFirstName.getText().toLowerCase())
-                        && s.getLastName().toLowerCase().startsWith(filterLastName.getText().toLowerCase())
-                        && s.getAriaID().toLowerCase().startsWith(filterPatientNumber.getText().toLowerCase());
-            }
-        }).collect(Collectors.toList());
+        List<Patient> result = temp.stream().filter((Patient s) -> s.getFirstName().toLowerCase().startsWith(filterFirstName.getText().toLowerCase())
+                && s.getLastName().toLowerCase().startsWith(filterLastName.getText().toLowerCase())
+                && s.getAriaID().toLowerCase().startsWith(filterPatientNumber.getText().toLowerCase())).collect(Collectors.toList());
         updateList(result);
     }
 
@@ -714,5 +743,44 @@ public class PatientViewController implements Initializable {
         } else {
             object.getStyleClass().removeAll(cssElement);
         }
+    }
+
+    private void showConfirmDialog() {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Speichern erfolgreich!");
+        alert.setHeaderText(null);
+        alert.setContentText("Die Daten wurden erfolgreich gespeichert!");
+
+        alert.showAndWait();
+    }
+
+    private void showErrorDialog() {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Speichern fehlgeschlagen!");
+        alert.setHeaderText(null);
+        alert.setContentText("Das Speichern schlug fehl!");
+
+        alert.showAndWait();
+    }
+
+    private boolean confirmAbort() {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+                getClass().getResource("ModernTheme.css").toExternalForm());
+
+        alert.setTitle("Eingabe abbrechen?");
+        alert.setContentText("Wollen Sie wirklich abbrechen?");
+
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+
+        if (option.get() == ButtonType.OK) {
+            return true;
+        } else if (option.get() == ButtonType.CANCEL) {
+            return false;
+        }
+        return false;
+
     }
 }
