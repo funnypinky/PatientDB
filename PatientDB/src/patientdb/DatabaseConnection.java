@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.Alert;
@@ -34,10 +33,6 @@ public class DatabaseConnection {
 
     private boolean firstRun = true;
     private String filePath = new String();
-    private String user = "sa";
-    private String password = "";
-    private Connection con;
-    private Statement stmt = null;
     private int result = 0;
     private ICDCode icd10;
     private ICDCode icd3;
@@ -47,6 +42,8 @@ public class DatabaseConnection {
     private static final String TN_DIAGNOSIC = "diagnosicTable";
     private static final String TN_STAGING = "stagingTable";
     private static final String TN_SESSION = "sessionTable";
+
+    String url = "jdbc:sqlite:H:\\NetBeansProjects\\EpidApp_Git\\PatientDB\\PatientDB\\data\\data_sqllite.db";
 
     private final String userDir = System.getProperty("user.dir");
 
@@ -60,22 +57,18 @@ public class DatabaseConnection {
         boolean sessionTableExist = false;
         try {
             //create Data-Directory
-            File path = new File(new File(userDir + "\\data\\data.db").getParent());
+            File path = new File(new File(userDir + "\\data\\data_sqllite.db").getParent());
             System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Datapath: " + path.getAbsolutePath());
             if (!path.exists()) {
                 path.mkdir();
             }
-            Properties p = new Properties();
-            p.setProperty("sa", "");
-            p.setProperty("useUnicode", "true");
-            this.filePath = "jdbc:hsqldb:file:" + path.getAbsolutePath() + "\\data.db";
-            //Connect the Database
-            con = DriverManager.getConnection(this.filePath + ";hsqldb.lock_file=false", p);
-            //con = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/Patients",user,password);
-            System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Databasepath: " + this.filePath);
-            if (con != null) {
+            this.url = "jdbc:sqlite:" + path.getAbsolutePath() + "\\data_sqllite.db";
+
+            try (Connection conn = this.connect()) {
+                Statement stmt = conn.createStatement();
+                System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Databasepath: " + this.url);
                 System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Connection created successfully");
-                DatabaseMetaData databaseMetaData = con.getMetaData();
+                DatabaseMetaData databaseMetaData = conn.getMetaData();
                 //Check if table exists, when no the create the table
                 try (ResultSet resultSet = databaseMetaData.getTables(null, null, "%", new String[]{"TABLE"})) {
                     while (resultSet.next()) {
@@ -94,8 +87,6 @@ public class DatabaseConnection {
                         }
                     }
                 }
-                stmt = con.createStatement();
-                stmt.execute("SET DATABASE TRANSACTION CONTROL mvcc;");
                 if (!patientTableExist) {
                     result = stmt.executeUpdate(
                             "CREATE TABLE " + TN_PATIENT + " (ARIAID VARCHAR(50) NOT NULL,"
@@ -153,59 +144,67 @@ public class DatabaseConnection {
                             + "ON UPDATE CASCADE "
                             + "ON DELETE CASCADE);");
                 }
-            } else {
-                System.err.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("[e] " + LocalDate.now() + " " + LocalTime.now() + " Problem with creating connection");
+            System.exit(-1);
         }
 
     }
 
     public List<Patient> getPatientList() {
+        String sql = "SELECT * FROM patienttable";
         ArrayList<Patient> patientList = new ArrayList();
-        try {
-            ResultSet resultSet = stmt.executeQuery("SELECT * FROM PATIENTTABLE;");
-            while (resultSet.next()) {
+        try (Connection conn = this.connect();
+                Statement stmtList = conn.createStatement();
+                ResultSet rs = stmtList.executeQuery(sql)) {
+
+            while (rs.next()) {
                 Patient temp = new Patient();
                 temp.setSeries(new ArrayList<>());
-                temp.setAriaID(resultSet.getString("ARIAID"));
-                temp.setLastName(resultSet.getString("LASTNAME"));
-                temp.setFirstName(resultSet.getString("FIRSTNAME"));
-                temp.setSex(resultSet.getString("SEX"));
-                temp.setBirthday(resultSet.getString("BIRTHDAY") != null ? LocalDate.parse(resultSet.getString("BIRTHDAY")) : null);
-                temp.setDeathDay(resultSet.getString("DEATHDAY") != null ? LocalDate.parse(resultSet.getString("DEATHDAY")) : null);
-                temp.setStudy(resultSet.getString("STUDY"));
-                temp.setPretherapy(resultSet.getBoolean("PRETHERAPY"));
-                ResultSet resultDiagnosic = stmt.executeQuery("SELECT * FROM DIAGNOSICTABLE WHERE ARIAID='" + temp.getAriaID() + "';");
-                ResultSet resultStaging = stmt.executeQuery("SELECT * FROM STAGINGTABLE WHERE ARIAID='" + temp.getAriaID() + "';");
-                ResultSet resultSession = stmt.executeQuery("SELECT * FROM SessionTABLE WHERE ARIAID='" + temp.getAriaID() + "';");
-                while (resultDiagnosic.next()) {
-                    temp.setDiagnoses(new Diagnosis());
-                    temp.getDiagnose().setICD10(icd10.getItem(resultDiagnosic.getString("ICD10")));
-                    temp.getDiagnose().setPreop(resultDiagnosic.getBoolean("PREOP"));
-                    temp.getDiagnose().setPostop(resultDiagnosic.getBoolean("POSTOP"));
-                    temp.getDiagnose().setPrimary(resultDiagnosic.getBoolean("PRIMARYTUMOR"));
-                    temp.getDiagnose().setRezidiv(resultDiagnosic.getBoolean("REZIDIV"));
+                temp.setAriaID(rs.getString("ARIAID"));
+                temp.setLastName(rs.getString("LASTNAME"));
+                temp.setFirstName(rs.getString("FIRSTNAME"));
+                temp.setSex(rs.getString("SEX"));
+                temp.setBirthday(rs.getString("BIRTHDAY") != null ? LocalDate.parse(rs.getString("BIRTHDAY")) : null);
+                temp.setDeathDay(rs.getString("DEATHDAY") != null ? LocalDate.parse(rs.getString("DEATHDAY")) : null);
+                temp.setStudy(rs.getString("STUDY"));
+                temp.setPretherapy(rs.getBoolean("PRETHERAPY"));
+                try (Statement stmtDiagnosic = conn.createStatement();
+                        ResultSet resultDiagnosic = stmtDiagnosic.executeQuery("SELECT * FROM DIAGNOSICTABLE WHERE ARIAID='" + temp.getAriaID() + "';")) {
+                    while (resultDiagnosic.next()) {
+                        temp.setDiagnoses(new Diagnosis());
+                        temp.getDiagnose().setICD10(icd10.getItem(resultDiagnosic.getString("ICD10")));
+                        temp.getDiagnose().setPreop(resultDiagnosic.getBoolean("PREOP"));
+                        temp.getDiagnose().setPostop(resultDiagnosic.getBoolean("POSTOP"));
+                        temp.getDiagnose().setPrimary(resultDiagnosic.getBoolean("PRIMARYTUMOR"));
+                        temp.getDiagnose().setRezidiv(resultDiagnosic.getBoolean("REZIDIV"));
+                    }
                 }
-                while (resultStaging.next()) {
-                    temp.getDiagnose().setStaging((new Staging()));
-                    temp.getDiagnose().getStaging().setmCode(resultStaging.getString("mCode") != null ? mCode.getItem(resultStaging.getString("mCode")) : null);
-                    temp.getDiagnose().getStaging().setGrading(resultStaging.getString("GRAD"));
-                    temp.getDiagnose().getStaging().setSize(resultStaging.getString("SIZE"));
-                    temp.getDiagnose().getStaging().setLokal(resultStaging.getString("LOKAL"));
+                try (Statement stmtStaging = conn.createStatement();
+                        ResultSet resultStaging = stmtStaging.executeQuery("SELECT * FROM STAGINGTABLE WHERE ARIAID='" + temp.getAriaID() + "';")) {
+                    while (resultStaging.next()) {
+                        temp.getDiagnose().setStaging((new Staging()));
+                        temp.getDiagnose().getStaging().setmCode(resultStaging.getString("mCode") != null ? mCode.getItem(resultStaging.getString("mCode")) : null);
+                        temp.getDiagnose().getStaging().setGrading(resultStaging.getString("GRAD"));
+                        temp.getDiagnose().getStaging().setSize(resultStaging.getString("SIZE"));
+                        temp.getDiagnose().getStaging().setLokal(resultStaging.getString("LOKAL"));
+                    }
                 }
-                while (resultSession.next()) {
-                    Series serie = new Series();
-                    serie.setSimCT(resultSession.getBoolean("SIMCHEMO"));
-                    serie.setSimRT(resultSession.getBoolean("simRT"));
-                    serie.setTherapyDate(resultSession.getString("sessionDate") != null ? LocalDate.parse(resultSession.getString("sessionDate")) : null);
-                    serie.setInDay(resultSession.getString("inDay") != null ? LocalDate.parse(resultSession.getString("inDay")) : null);
-                    serie.setOutDay(resultSession.getString("outDay") != null ? LocalDate.parse(resultSession.getString("outDay")) : null);
-                    serie.setSapNumber(resultSession.getString("caseNumber"));
-                    serie.setComments(resultSession.getString("comments"));
-                    serie.setComplication(resultSession.getString("problems"));
-                    temp.getSeries().add(serie);
+                try (Statement stmtSession = conn.createStatement();
+                        ResultSet resultSession = stmtSession.executeQuery("SELECT * FROM SessionTABLE WHERE ARIAID='" + temp.getAriaID() + "';")) {
+                    while (resultSession.next()) {
+                        Series serie = new Series();
+                        serie.setSimCT(resultSession.getBoolean("SIMCHEMO"));
+                        serie.setSimRT(resultSession.getBoolean("simRT"));
+                        serie.setTherapyDate(resultSession.getString("sessionDate") != null ? LocalDate.parse(resultSession.getString("sessionDate")) : null);
+                        serie.setInDay(resultSession.getString("inDay") != null ? LocalDate.parse(resultSession.getString("inDay")) : null);
+                        serie.setOutDay(resultSession.getString("outDay") != null ? LocalDate.parse(resultSession.getString("outDay")) : null);
+                        serie.setSapNumber(resultSession.getString("caseNumber"));
+                        serie.setComments(resultSession.getString("comments"));
+                        serie.setComplication(resultSession.getString("problems"));
+                        temp.getSeries().add(serie);
+                    }
                 }
                 patientList.add(temp);
             }
@@ -216,7 +215,8 @@ public class DatabaseConnection {
     }
 
     public void updatePatient(Patient patient, String oldAriaID) {
-        try {
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
             if (patient.getAriaID() != null && patient.getFirstName() != null && patient.getLastName() != null) {
 
                 if (rowCount("patientTable", oldAriaID) <= 0) {
@@ -253,18 +253,22 @@ public class DatabaseConnection {
     }
 
     public int rowCount(String tableName, String whereAriaIDArgument) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM " + tableName;
-        if (whereAriaIDArgument != null) {
-            sql += " WHERE ariaID = '" + whereAriaIDArgument + "';";
-        } else {
-            sql += ";";
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
+            String sql = "SELECT COUNT(*) FROM " + tableName;
+            if (whereAriaIDArgument != null) {
+                sql += " WHERE ariaID = '" + whereAriaIDArgument + "';";
+            } else {
+                sql += ";";
+            }
+            ResultSet resultSet = stmt.executeQuery(sql);
+            int rowCount = -1;
+            while (resultSet.next()) {
+                rowCount = Integer.parseInt(resultSet.getString(1));
+            }
+            return rowCount;
         }
-        ResultSet resultSet = stmt.executeQuery(sql);
-        int rowCount = -1;
-        while (resultSet.next()) {
-            rowCount = Integer.parseInt(resultSet.getString(1));
-        }
-        return rowCount;
+
     }
 
     private String sqlInsertPatient(Patient patient) {
@@ -430,51 +434,52 @@ public class DatabaseConnection {
     }
 
     public boolean sqlInsertSession(String ariaID, Series session) {
-        try {
-            StringBuilder sql = new StringBuilder("INSERT INTO sessiontable (");
-            sql.append("ARIAID, simChemo, simRT");
-            if (session.getTherapyDate() != null) {
-                sql.append(" ,sessionDate");
-            }
-            if (session.getInDay() != null) {
-                sql.append(" ,inDay");
-            }
-            if (session.getOutDay() != null) {
-                sql.append(" ,outDay");
-            }
-            if (session.getSapNumber() != null) {
-                sql.append(" ,CaseNumber");
-            }
-            if (session.getComments() != null) {
-                sql.append(" ,comments");
-            }
-            if (session.getComplication() != null) {
-                sql.append(" ,problems");
-            }
-            sql.append(") VALUES ('");
-            sql.append(ariaID).append("'");
-            sql.append(",").append(session.getSimCT());
-            sql.append(",").append(session.getSimRT());
-            if (session.getTherapyDate() != null) {
-                sql.append(",'").append(session.getTherapyDate()).append("'");
-            }
-            if (session.getInDay() != null) {
-                sql.append(",'").append(session.getInDay()).append("'");
-            }
-            if (session.getOutDay() != null) {
-                sql.append(",'").append(session.getOutDay()).append("'");
-            }
-            if (session.getSapNumber() != null) {
-                sql.append(",'").append(session.getSapNumber()).append("'");
-            }
-            if (session.getComments() != null) {
-                sql.append(",'").append(session.getComments()).append("'");
-            }
-            if (session.getComplication() != null) {
-                sql.append(",'").append(session.getComplication()).append("'");
-            }
-            sql.append(");");
 
+        StringBuilder sql = new StringBuilder("INSERT INTO sessiontable (");
+        sql.append("ARIAID, simChemo, simRT");
+        if (session.getTherapyDate() != null) {
+            sql.append(" ,sessionDate");
+        }
+        if (session.getInDay() != null) {
+            sql.append(" ,inDay");
+        }
+        if (session.getOutDay() != null) {
+            sql.append(" ,outDay");
+        }
+        if (session.getSapNumber() != null) {
+            sql.append(" ,CaseNumber");
+        }
+        if (session.getComments() != null) {
+            sql.append(" ,comments");
+        }
+        if (session.getComplication() != null) {
+            sql.append(" ,problems");
+        }
+        sql.append(") VALUES ('");
+        sql.append(ariaID).append("'");
+        sql.append(",").append(session.getSimCT());
+        sql.append(",").append(session.getSimRT());
+        if (session.getTherapyDate() != null) {
+            sql.append(",'").append(session.getTherapyDate()).append("'");
+        }
+        if (session.getInDay() != null) {
+            sql.append(",'").append(session.getInDay()).append("'");
+        }
+        if (session.getOutDay() != null) {
+            sql.append(",'").append(session.getOutDay()).append("'");
+        }
+        if (session.getSapNumber() != null) {
+            sql.append(",'").append(session.getSapNumber()).append("'");
+        }
+        if (session.getComments() != null) {
+            sql.append(",'").append(session.getComments()).append("'");
+        }
+        if (session.getComplication() != null) {
+            sql.append(",'").append(session.getComplication()).append("'");
+        }
+        sql.append(");");
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
             return stmt.executeUpdate(sql.toString()) > 0;
 
         } catch (SQLException ex) {
@@ -483,17 +488,9 @@ public class DatabaseConnection {
         return false;
     }
 
-    public void closeDB() {
-        try {
-            System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Connection is closing");
-            this.con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public boolean deletePatient(Patient patient) {
-        try {
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
             return stmt.executeUpdate("DELETE FROM PATIENTTABLE WHERE ARIAID='" + patient.getAriaID() + "'") > 0;
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
@@ -501,12 +498,14 @@ public class DatabaseConnection {
         return false;
     }
 
-    public Connection getCon() {
-        return con;
+    public Connection connect() {
+        // SQLite connection string
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return conn;
     }
-
-    public Statement getStmt() {
-        return stmt;
-    }
-
 }

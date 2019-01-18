@@ -49,7 +49,7 @@ public class Print {
             File path = new File("printtemplates\\krankenkasse.jrxml");
             try {
                 jasperReport = JasperCompileManager.compileReport(path.getAbsolutePath());
-                jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, this.connection.getCon());
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, this.connection.connect());
             } catch (JRException ex) {
                 Logger.getLogger(Print.class.getName()).log(Level.SEVERE, null, ex);
             }

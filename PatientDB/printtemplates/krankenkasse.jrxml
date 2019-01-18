@@ -33,12 +33,7 @@
 	<style name="Text" isDefault="true" vTextAlign="Middle" fontName="Verdana" fontSize="10"/>
 	<subDataset name="Dataset1" uuid="ad4c4b98-8c08-45fe-846e-95cd12b8a986">
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Test"/>
-		<property name="com.jaspersoft.studio.data.sql.tables">
-			<![CDATA[IlNFU1NJT05UQUJMRSIgQVMgLDE1LDQxLDIzZWE5YWQxLTk2ZWUtNDJjMC1hMWM0LWYxNDc4Y2Jj
-ZTIzNzsiRElBR05PU0lDVEFCTEUiIEFTICwxNzYsOTMsYmI5NmE4NGYtYmRhNi00NGFlLWI1NmEt
-NmQ0N2MwNmM5YWU5OyJQQVRJRU5UVEFCTEUiIEFTICwzMzQsMTUsYjkyNDNjNjgtMmY5Yy00MzE4
-LWEzNjktM2QzNDI3N2MwZTE3Ow==]]>
-		</property>
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<queryString>
 			<![CDATA[SELECT "SESSIONTABLE"."ARIAID",
 	"SESSIONTABLE"."INDAY",
@@ -59,11 +54,11 @@ FROM "SESSIONTABLE"
 			<property name="com.jaspersoft.studio.field.label" value="ARIAID"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 		</field>
-		<field name="INDAY" class="java.sql.Date">
+		<field name="INDAY" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.label" value="INDAY"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 		</field>
-		<field name="OUTDAY" class="java.sql.Date">
+		<field name="OUTDAY" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.label" value="OUTDAY"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 		</field>
@@ -87,7 +82,7 @@ FROM "SESSIONTABLE"
 			<property name="com.jaspersoft.studio.field.label" value="ARIAID"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="PATIENTTABLE"/>
 		</field>
-		<field name="BIRTHDAY" class="java.sql.Date">
+		<field name="BIRTHDAY" class="java.sql.Timestamp">
 			<property name="com.jaspersoft.studio.field.label" value="BIRTHDAY"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="PATIENTTABLE"/>
 		</field>
@@ -118,7 +113,7 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 		<property name="com.jaspersoft.studio.field.label" value="ICD10"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="DIAGNOSICTABLE"/>
 	</field>
-	<field name="BIRTHDAY" class="java.sql.Date">
+	<field name="BIRTHDAY" class="java.lang.Object">
 		<property name="com.jaspersoft.studio.field.label" value="BIRTHDAY"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="PATIENTTABLE"/>
 	</field>
@@ -130,15 +125,15 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 		<property name="com.jaspersoft.studio.field.label" value="STUDYNAME"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="PATIENTTABLE"/>
 	</field>
-	<field name="INDAY" class="java.sql.Date">
+	<field name="INDAY" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="INDAY"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 	</field>
-	<field name="OUTDAY" class="java.sql.Date">
+	<field name="OUTDAY" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="OUTDAY"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 	</field>
-	<field name="SESSIONDATE" class="java.sql.Date">
+	<field name="SESSIONDATE" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="SESSIONDATE"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 	</field>
@@ -160,63 +155,63 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 	<group name="Patients">
 		<groupExpression><![CDATA[$F{ARIAID}]]></groupExpression>
 		<groupHeader>
-			<band height="72" splitType="Stretch">
+			<band height="50" splitType="Stretch">
 				<rectangle>
-					<reportElement x="0" y="0" width="802" height="42" backcolor="rgba(58, 170, 53, 0.57254905)" uuid="ce206244-e06c-4f9b-9356-8e355500eefa"/>
+					<reportElement x="0" y="0" width="802" height="25" backcolor="rgba(58, 170, 53, 0.57254905)" uuid="ce206244-e06c-4f9b-9356-8e355500eefa"/>
 					<graphicElement>
 						<pen lineWidth="0.0"/>
 					</graphicElement>
 				</rectangle>
 				<staticText>
-					<reportElement x="0" y="0" width="110" height="41" uuid="028c8c9f-6513-4726-be6b-1df5557f95e3"/>
+					<reportElement x="0" y="0" width="110" height="25" uuid="028c8c9f-6513-4726-be6b-1df5557f95e3"/>
 					<text><![CDATA[Patientennummer:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="110" y="0" width="100" height="41" uuid="b7d2deef-6665-4e1e-aa17-21980720a9c5"/>
+					<reportElement x="110" y="0" width="100" height="25" uuid="b7d2deef-6665-4e1e-aa17-21980720a9c5"/>
 					<textFieldExpression><![CDATA[$F{ARIAID}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="0" y="41" width="100" height="25" uuid="65ed530c-dec5-4d5a-9a1f-9053123e21f8"/>
+					<reportElement x="0" y="25" width="100" height="25" uuid="65ed530c-dec5-4d5a-9a1f-9053123e21f8"/>
 					<text><![CDATA[Fallnummer]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="220" y="0" width="100" height="41" uuid="c7b8a744-3277-4fd3-9e16-24d8ec6bd343"/>
+					<reportElement x="220" y="0" width="100" height="25" uuid="c7b8a744-3277-4fd3-9e16-24d8ec6bd343"/>
 					<text><![CDATA[Geburtstag:]]></text>
 				</staticText>
-				<textField pattern="dd.MM.yyyy">
-					<reportElement x="320" y="0" width="100" height="41" uuid="a3cf0b1b-2086-488c-a570-047b1cc72368"/>
+				<textField>
+					<reportElement x="320" y="0" width="100" height="25" uuid="a3cf0b1b-2086-488c-a570-047b1cc72368"/>
 					<textFieldExpression><![CDATA[$F{BIRTHDAY}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="110" y="41" width="100" height="25" uuid="a6f8f63d-9348-4ad3-a471-20277e435e11"/>
+					<reportElement x="110" y="25" width="100" height="25" uuid="a6f8f63d-9348-4ad3-a471-20277e435e11"/>
 					<text><![CDATA[Behandlungstag]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="220" y="41" width="100" height="25" uuid="2344c0fd-694c-4fa6-90c2-4baa76ff34da">
+					<reportElement x="220" y="25" width="100" height="25" uuid="2344c0fd-694c-4fa6-90c2-4baa76ff34da">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7880335a-fae8-4e0b-8986-7e1f1ae6bfef"/>
 					</reportElement>
 					<text><![CDATA[Aufnahmetag]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="330" y="42" width="100" height="25" uuid="b2d6fb18-b3d2-4828-b401-02736d5f451d">
+					<reportElement x="330" y="25" width="100" height="25" uuid="b2d6fb18-b3d2-4828-b401-02736d5f451d">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aabf54bf-5d47-454f-ba41-ef7f48966e8c"/>
 					</reportElement>
 					<text><![CDATA[Entlassungstag]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="440" y="42" width="100" height="25" uuid="cea3c7ac-a468-47b0-b432-b47717265797">
+					<reportElement x="440" y="25" width="100" height="25" uuid="cea3c7ac-a468-47b0-b432-b47717265797">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1eca9591-52d2-4c8b-88c5-e54bcf9c8d9a"/>
 					</reportElement>
 					<text><![CDATA[Diagnose (ICD-10)]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="550" y="42" width="100" height="30" uuid="98b5faf3-3619-41fd-8f34-017ab9dd8f84">
+					<reportElement x="550" y="25" width="100" height="25" uuid="98b5faf3-3619-41fd-8f34-017ab9dd8f84">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bcbf5fe6-21dc-4251-810f-1544ceba8f7b"/>
 					</reportElement>
 					<text><![CDATA[Studienteilnahme]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="660" y="42" width="100" height="30" uuid="b7ae3926-a094-43e4-ae40-437b0b5e72ca">
+					<reportElement x="660" y="25" width="100" height="25" uuid="b7ae3926-a094-43e4-ae40-437b0b5e72ca">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3cf35a09-88ef-42de-a30a-1adb53d60b73"/>
 					</reportElement>
 					<text><![CDATA[Studientitel]]></text>
@@ -307,7 +302,7 @@ Hyperthermie]]></text>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="51" splitType="Prevent">
+		<band height="33" splitType="Prevent">
 			<textField>
 				<reportElement positionType="FixRelativeToBottom" x="600" y="17" width="100" height="15" uuid="f240a406-6bae-45ca-92ea-dd98a3138677"/>
 				<textElement textAlignment="Right">

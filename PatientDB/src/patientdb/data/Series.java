@@ -6,6 +6,7 @@
 package patientdb.data;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -22,7 +23,7 @@ public class Series extends ItemOfTree {
 
     private String complication;
 
-    private LocalDate therapyDate;
+    private LocalDate therapyDate = LocalDate.of(1900, Month.JANUARY, 1);
 
     private LocalDate inDay;
 
@@ -100,6 +101,9 @@ public class Series extends ItemOfTree {
 
     @Override
     public String toString() {
+        if(this.therapyDate == null){
+            this.therapyDate = LocalDate.of(1900, Month.JANUARY, 1);
+        }
         return "Fall: " + sapNumber + "\t " + this.therapyDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 @Override

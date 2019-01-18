@@ -63,7 +63,6 @@ public class PatientDBPreloader extends Preloader implements Initializable {
         this.preloaderStage.setScene(scene);
         this.preloaderStage.initStyle(StageStyle.UNDECORATED);
         this.preloaderStage.setTitle("Lade Anwendung...");
-
         this.preloaderStage.show();
 
     }

@@ -747,6 +747,9 @@ public class PatientViewController implements Initializable {
 
     private void showConfirmDialog() {
         Alert alert = new Alert(AlertType.INFORMATION);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+                getClass().getResource("ModernTheme.css").toExternalForm());
         alert.setTitle("Speichern erfolgreich!");
         alert.setHeaderText(null);
         alert.setContentText("Die Daten wurden erfolgreich gespeichert!");
@@ -756,6 +759,9 @@ public class PatientViewController implements Initializable {
 
     private void showErrorDialog() {
         Alert alert = new Alert(AlertType.ERROR);
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(
+                getClass().getResource("ModernTheme.css").toExternalForm());
         alert.setTitle("Speichern fehlgeschlagen!");
         alert.setHeaderText(null);
         alert.setContentText("Das Speichern schlug fehl!");

@@ -79,6 +79,7 @@ public class PatientDB extends Application {
             });
             loader.setLocation(this.getClass().getResource("view/MainView.fxml"));
             rootLayout = (BorderPane) loader.load();
+            
             //rootLayout.getStylesheets().add(getClass().getResource("view/ModernTheme.css").toExternalForm());
             Scene scene = new Scene(rootLayout);
             scene.getStylesheets().addAll(this.getClass().getResource("view/ModernTheme.css").toExternalForm());
@@ -103,7 +104,6 @@ public class PatientDB extends Application {
 
     @Override
     public void stop() {
-        this.connection.closeDB();
         this.timerRefresh.cancel();
         this.timerRefresh.purge();
         System.out.println("[i] " + LocalDate.now() + " " + LocalTime.now() + " Stage is closing");
