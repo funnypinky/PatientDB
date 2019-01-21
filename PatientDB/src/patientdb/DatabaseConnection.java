@@ -139,7 +139,7 @@ public class DatabaseConnection {
                             + "caseNumber VARCHAR(75),"
                             + "comments LONGVARCHAR,"
                             + "problems LONGVARCHAR,"
-                            + "PRIMARY KEY (caseNumber),"
+                            + "uniqueID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"
                             + "FOREIGN KEY(ARIAID) REFERENCES diagnosictable (ARIAID) "
                             + "ON UPDATE CASCADE "
                             + "ON DELETE CASCADE);");
@@ -194,7 +194,7 @@ public class DatabaseConnection {
                 try (Statement stmtSession = conn.createStatement();
                         ResultSet resultSession = stmtSession.executeQuery("SELECT * FROM SessionTABLE WHERE ARIAID='" + temp.getAriaID() + "';")) {
                     while (resultSession.next()) {
-                        Series serie = new Series();
+                        Series serie = new Series(resultSession.getInt("uniqueID"));
                         serie.setSimCT(resultSession.getBoolean("SIMCHEMO"));
                         serie.setSimRT(resultSession.getBoolean("simRT"));
                         serie.setTherapyDate(resultSession.getString("sessionDate") != null ? LocalDate.parse(resultSession.getString("sessionDate")) : null);
@@ -431,6 +431,41 @@ public class DatabaseConnection {
         sql.append(" WHERE ARIAID ='").append(ariaID).append("';");
 
         return sql.toString();
+    }
+
+    public boolean sqlUpdateSession(String ariaID, long uniqueID, Series session) {
+        StringBuilder sql = new StringBuilder("UPDATE sessionTable SET ");
+        sql.append("ARIAID ='").append(ariaID).append("'");
+        if (session.getTherapyDate() != null) {
+            sql.append(",").append("sessionDate ='").append(session.getTherapyDate()).append("'");
+        }
+        if (session.getInDay() != null) {
+            sql.append(",").append("inDay ='").append(session.getInDay()).append("'");
+        }
+        if (session.getOutDay() != null) {
+            sql.append(",").append("outDay ='").append(session.getOutDay()).append("'");
+        }
+        if (session.getSapNumber() != null) {
+            sql.append(",").append("CaseNumber ='").append(session.getSapNumber()).append("'");
+        }
+        if (session.getComments() != null) {
+            sql.append(",").append("comments ='").append(session.getComments()).append("'");
+        }
+        if (session.getComplication() != null) {
+            sql.append(",").append("problems ='").append(session.getComplication()).append("'");
+        }
+        sql.append(",").append("simChemo =").append(session.getSimCT()).append(" ");
+        sql.append(",").append("simRT =").append(session.getSimRT()).append(" ");
+        sql.append(" WHERE uniqueID ='").append(uniqueID).append("';");
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
+            return stmt.executeUpdate(sql.toString()) > 0;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(sql);
+        }
+        return false;
     }
 
     public boolean sqlInsertSession(String ariaID, Series session) {

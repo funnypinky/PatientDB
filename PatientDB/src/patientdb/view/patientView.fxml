@@ -214,6 +214,7 @@
                               <FlowPane>
                                  <children>
                                     <Button fx:id="addSession" disable="true" mnemonicParsing="false" onAction="#addSessionAction" text="Neue Sitzung" />
+                                    <Button fx:id="changeSession" disable="true" mnemonicParsing="false" onAction="#changeSessionAction" text="Sitzung ändern" />
                                     <Button fx:id="saveSession" mnemonicParsing="false" onAction="#saveSession" text="Speichern" visible="false" />
                                     <Button fx:id="abortSession" mnemonicParsing="false" onAction="#abortSessionAction" text="Abbrechen" visible="false" />
                                  </children>

@@ -57,7 +57,7 @@ import patientdb.data.Staging;
  * @TODO:2018-09-07:Test ob erforderliche Eingaben gemacht wurden -done
  * @TODO:2018-09-14:Test ob PatientID doppelt vergeben wird -done
  * @TODO:2019-01-15:Fall sortieren - nach Datum -done
- * @TODO:2019-01-15:Sitzungsdaten ändern
+ * @TODO:2019-01-15:Sitzungsdaten ändern -done
  * @TODO:2019-01-15:Dialog "Speichern ok" -done
  * @TODO:2019-01-15:Dialog "Speichern abbrechen" -done
  * @TODO:2019-01-15:ICD-O Eintrag bei Patientenwechseln aktuallieren -> ICD-O
@@ -155,12 +155,16 @@ public class PatientViewController implements Initializable {
     private Label filterSummary;
     @FXML
     private Button refreshBt;
+    @FXML
+    private Button changeSession;
 
     private DatabaseConnection connection = null;
 
     private ICDCode icd10 = null;
     private ICDCode icd3 = null;
     private ICDCode mCode = null;
+
+    private boolean changeSessionStatus = false;
 
     private final Image nodeImage = new Image(getClass().getResourceAsStream("images/human.png"), 18, 18, false, true);
 
@@ -188,6 +192,7 @@ public class PatientViewController implements Initializable {
         new AutoCompleteComboBoxListener(histoTF);
         //new AutoCompleteComboBoxListener(icdoTF); //not used
 
+//Check double Entrys
         UnaryOperator<Change> rejectChange = (Change c) -> {
             // check if the change might effect the validating predicate
             if (c.isContentChange() && !ariaIDTF.isDisable()) {
@@ -208,8 +213,8 @@ public class PatientViewController implements Initializable {
             // valid change: accept the change by returning it
             return c;
         };
-        ariaIDTF.setTextFormatter(new TextFormatter(rejectChange));
 
+        ariaIDTF.setTextFormatter(new TextFormatter(rejectChange));
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 clearPatient();
@@ -408,9 +413,11 @@ public class PatientViewController implements Initializable {
 
     public void saveSession(ActionEvent event) {
         Patient selectPatient;
+        long uniqueID = -1;
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
         if (selectedItem.getValue().getClass() != Patient.class) {
             selectPatient = (Patient) selectedItem.getParent().getValue();
+            uniqueID = ((Series) selectedItem.getValue()).getUniqueID();
         } else {
             selectPatient = (Patient) selectedItem.getValue();
         }
@@ -425,19 +432,24 @@ public class PatientViewController implements Initializable {
         selectPatient.getSeries().get(lastIndex).setSimRT(this.simRTBoolean.isSelected());
         selectPatient.getSeries().get(lastIndex).setComplication(this.compilikationTA.getText());
         selectPatient.getSeries().get(lastIndex).setComments(this.commentTA.getText());
-        if (selectedItem.getValue() instanceof Patient) {
-            selectedItem.getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
+        if (changeSessionStatus) {
+            if (connection.sqlUpdateSession(selectPatient.getAriaID(), uniqueID, selectPatient.getSeries().get(lastIndex))) {
+                showConfirmDialog();
+                updateList();
+            } else {
+                showErrorDialog();
+            }
         } else {
-            selectedItem.getParent().getChildren().add(new TreeItem(selectPatient.getSeries().get(lastIndex)));
-
-        }
-        if (connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex))) {
-            showConfirmDialog();
-        } else {
-            showErrorDialog();
+            if (connection.sqlInsertSession(selectPatient.getAriaID(), selectPatient.getSeries().get(lastIndex))) {
+                showConfirmDialog();
+                updateList();
+            } else {
+                showErrorDialog();
+            }
         }
         clearSession();
-
+        this.changeSessionStatus = false;
+        getPatientFromList(null);
     }
 
     /**
@@ -460,7 +472,6 @@ public class PatientViewController implements Initializable {
         changePatientBt.setDisable(false);
         deletePatientBt.setDisable(false);
 
-        caseTF.clear();
         changeCSS(addSession, false, "button-active");
 
     }
@@ -563,6 +574,7 @@ public class PatientViewController implements Initializable {
                 this.outDay.setValue(selectSeries.getOutDay());
                 this.compilikationTA.setText(selectSeries.getComplication());
                 this.commentTA.setText(selectSeries.getComments());
+                this.changeSession.setDisable(false);
             }
         }
     }
@@ -588,6 +600,18 @@ public class PatientViewController implements Initializable {
         saveNewPatient.setVisible(true);
         abortNewPatient.setVisible(true);
         changeCSS(changePatientBt, false, "button-active");
+    }
+
+    @FXML
+    public void changeSessionAction(ActionEvent event) {
+        TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
+        if (selectedItem.getValue() instanceof Series) {
+            changeStatusSessionPanel(true);
+            saveSession.setVisible(true);
+            abortSession.setVisible(true);
+            this.changeSessionStatus = true;
+            changeCSS(changeSession, false, "button-active");
+        }
     }
 
     private void changeEditStatus(boolean status) {

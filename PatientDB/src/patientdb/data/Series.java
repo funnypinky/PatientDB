@@ -33,6 +33,15 @@ public class Series extends ItemOfTree {
 
     private String comments;
 
+    private long uniqueID;
+
+    public Series() {
+    }
+
+    public Series(long uniqueID) {
+        this.uniqueID = uniqueID;
+    }
+
     public Boolean getSimCT() {
         return simCT;
     }
@@ -101,12 +110,13 @@ public class Series extends ItemOfTree {
 
     @Override
     public String toString() {
-        if(this.therapyDate == null){
+        if (this.therapyDate == null) {
             this.therapyDate = LocalDate.of(1900, Month.JANUARY, 1);
         }
         return "Fall: " + sapNumber + "\t " + this.therapyDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
-@Override
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Series)) {
             return false;
@@ -128,4 +138,10 @@ public class Series extends ItemOfTree {
         hash = 83 * hash + Objects.hashCode(this.sapNumber);
         return hash;
     }
+
+    public long getUniqueID() {
+        return uniqueID;
+    }
+
+    
 }
