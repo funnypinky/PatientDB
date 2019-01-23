@@ -242,7 +242,7 @@
                                     <Label text="Entlassungsdatum" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                     <DatePicker fx:id="inDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                     <DatePicker fx:id="outDay" disable="true" promptText="tt.mm.jjjj" styleClass="datePicker" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                                    <TextField fx:id="caseTF" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <ComboBox fx:id="caseTF" disable="true" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                  </children>
                               </GridPane>
                               <Label text="Komplikationen" />

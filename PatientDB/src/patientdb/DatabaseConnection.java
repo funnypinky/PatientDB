@@ -10,6 +10,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import patientdb.data.Diagnosis;
 import patientdb.data.Patient;
@@ -55,6 +58,8 @@ public class DatabaseConnection {
         boolean diagnosicTableExist = false;
         boolean stagingTableExist = false;
         boolean sessionTableExist = false;
+        
+        
         try {
             //create Data-Directory
             File path = new File(new File(userDir + "\\data\\data_sqllite.db").getParent());
@@ -152,6 +157,21 @@ public class DatabaseConnection {
 
     }
 
+    public ObservableList<String> getSAPNumbers(String ariaID){
+        String sql = "SELECT CASENUMBER FROM SESSIONTABLE WHERE ARIAID = ? Group by casenumber;";
+        ArrayList<String> sapList = new ArrayList();
+        try (Connection conn = this.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, ariaID);
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                sapList.add(rs.getString("caseNumber"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return FXCollections.observableList(sapList);
+    }
     public List<Patient> getPatientList() {
         String sql = "SELECT * FROM patienttable";
         ArrayList<Patient> patientList = new ArrayList();

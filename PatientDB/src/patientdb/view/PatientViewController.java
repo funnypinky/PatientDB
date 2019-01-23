@@ -134,7 +134,7 @@ public class PatientViewController implements Initializable {
     @FXML
     private TextField studyNameTF;
     @FXML
-    private TextField caseTF;
+    private ComboBox caseTF;
     @FXML
     private DatePicker outDay;
     @FXML
@@ -222,10 +222,18 @@ public class PatientViewController implements Initializable {
                 getPatientFromList(null);
                 changePatientBt.setDisable(false);
                 deletePatientBt.setDisable(false);
+                addSession.setDisable(false);
+                TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
+                if(selectedItem.getValue() instanceof Series) {
+                    changeSession.setDisable(false);
+                } else {
+                    changeSession.setDisable(true);
+                }
             } else {
                 changePatientBt.setDisable(true);
                 deletePatientBt.setDisable(true);
                 addSession.setDisable(true);
+                changeSession.setDisable(true);
                 clearMask();
             }
         });
@@ -412,6 +420,7 @@ public class PatientViewController implements Initializable {
     }
 
     public void saveSession(ActionEvent event) {
+        changeCSS(addSession, true, "button-active");
         Patient selectPatient;
         long uniqueID = -1;
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
@@ -424,7 +433,7 @@ public class PatientViewController implements Initializable {
         selectPatient.setSeries(new ArrayList<>());
         selectPatient.getSeries().add(new Series());
         int lastIndex = selectPatient.getSeries().size() - 1;
-        selectPatient.getSeries().get(lastIndex).setSapNumber(caseTF.getText());
+        selectPatient.getSeries().get(lastIndex).setSapNumber(caseTF.getSelectionModel().getSelectedItem().toString());
         selectPatient.getSeries().get(lastIndex).setTherapyDate(this.firstHTDate.getValue());
         selectPatient.getSeries().get(lastIndex).setInDay(this.inDay.getValue());
         selectPatient.getSeries().get(lastIndex).setOutDay(this.outDay.getValue());
@@ -452,9 +461,6 @@ public class PatientViewController implements Initializable {
         getPatientFromList(null);
     }
 
-    /**
-     * TODO: Clear Action
-     */
     @FXML
     public void abortSessionAction(ActionEvent event) {
         if (confirmAbort()) {
@@ -526,7 +532,6 @@ public class PatientViewController implements Initializable {
     @FXML
     public void getPatientFromList(ActionEvent event) {
         clearMask();
-        addSession.setDisable(false);
         clearSession();
         TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
         Patient selectPatient;
@@ -550,6 +555,8 @@ public class PatientViewController implements Initializable {
                 studyNameTF.setText(selectPatient.getStudyName());
                 preopBoolean.setSelected(selectPatient.getPretherapy());
 
+                this.caseTF.setItems(this.connection.getSAPNumbers(selectPatient.getAriaID()));
+                
                 if (selectPatient.getDiagnose() != null) {
                     tumorTF.setValue(selectPatient.getDiagnose().getICD10());
                     primaryBoolean.setSelected(selectPatient.getDiagnose().isPrimary());
@@ -568,13 +575,12 @@ public class PatientViewController implements Initializable {
             if (selectSeries != null) {
                 this.simCTBoolean.setSelected(selectSeries.getSimCT());
                 this.simRTBoolean.setSelected(selectSeries.getSimRT());
-                this.caseTF.setText(selectSeries.getSapNumber());
+                this.caseTF.getSelectionModel().select(selectSeries.getSapNumber());
                 this.firstHTDate.setValue(selectSeries.getTherapyDate());
                 this.inDay.setValue(selectSeries.getInDay());
                 this.outDay.setValue(selectSeries.getOutDay());
                 this.compilikationTA.setText(selectSeries.getComplication());
                 this.commentTA.setText(selectSeries.getComments());
-                this.changeSession.setDisable(false);
             }
         }
     }
@@ -656,7 +662,7 @@ public class PatientViewController implements Initializable {
     private void clearSessionPanel() {
         inDay.setValue(null);
         outDay.setValue(null);
-        caseTF.clear();
+        caseTF.getSelectionModel().clearSelection();
         firstHTDate.setValue(null);
         commentTA.clear();
         compilikationTA.clear();
@@ -670,7 +676,7 @@ public class PatientViewController implements Initializable {
         firstHTDate.setValue(null);
         inDay.setValue(null);
         outDay.setValue(null);
-        caseTF.clear();
+        caseTF.getItems().clear();
         studyNameTF.clear();
         commentTA.clear();
         compilikationTA.clear();
