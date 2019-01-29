@@ -54,7 +54,7 @@ FROM "SESSIONTABLE"
 			<property name="com.jaspersoft.studio.field.label" value="ARIAID"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 		</field>
-		<field name="INDAY" class="java.lang.String">
+		<field name="INDAY" class="java.lang.Object">
 			<property name="com.jaspersoft.studio.field.label" value="INDAY"/>
 			<property name="com.jaspersoft.studio.field.tree.path" value="SESSIONTABLE"/>
 		</field>
@@ -113,7 +113,7 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 		<property name="com.jaspersoft.studio.field.label" value="ICD10"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="DIAGNOSICTABLE"/>
 	</field>
-	<field name="BIRTHDAY" class="java.lang.Object">
+	<field name="BIRTHDAY" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="BIRTHDAY"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="PATIENTTABLE"/>
 	</field>
@@ -180,7 +180,7 @@ ORDER BY PATIENTTABLE.ARIAID DESC]]>
 				</staticText>
 				<textField>
 					<reportElement x="320" y="0" width="100" height="25" uuid="a3cf0b1b-2086-488c-a570-047b1cc72368"/>
-					<textFieldExpression><![CDATA[$F{BIRTHDAY}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format( new SimpleDateFormat("yyyy-MM-dd").parse($F{BIRTHDAY}))]]></textFieldExpression>
 				</textField>
 				<staticText>
 					<reportElement x="110" y="25" width="100" height="25" uuid="a6f8f63d-9348-4ad3-a471-20277e435e11"/>
@@ -265,21 +265,21 @@ Hyperthermie]]></text>
 				<reportElement x="0" y="0" width="100" height="25" uuid="ee1e3f16-bbba-4cc0-b498-0155296e5e0e"/>
 				<textFieldExpression><![CDATA[$F{CASENUMBER}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yyyy">
+			<textField>
 				<reportElement x="110" y="0" width="100" height="25" uuid="ad5f43ae-e6d1-4e18-b0d0-48bf12bc6aae"/>
-				<textFieldExpression><![CDATA[$F{SESSIONDATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format( new SimpleDateFormat("yyyy-MM-dd").parse($F{SESSIONDATE}))]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy">
 				<reportElement x="220" y="0" width="100" height="25" uuid="72fdb368-d5ae-4e67-84fc-475edf9ac3aa">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7880335a-fae8-4e0b-8986-7e1f1ae6bfef"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{INDAY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INDAY}!=null?new SimpleDateFormat("dd.MM.yyyy").format( new SimpleDateFormat("yyyy-MM-dd").parse($F{INDAY})):"N/A"]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy">
 				<reportElement x="330" y="0" width="100" height="25" uuid="69f5b641-ac05-4989-9bd9-b0663964a394">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aabf54bf-5d47-454f-ba41-ef7f48966e8c"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{OUTDAY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{OUTDAY}!=null?new SimpleDateFormat("dd.MM.yyyy").format( new SimpleDateFormat("yyyy-MM-dd").parse($F{OUTDAY})):"N/A"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="440" y="0" width="100" height="25" uuid="0b636f3d-c262-46f8-8846-7feaf7eaa630">
