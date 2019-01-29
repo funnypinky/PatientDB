@@ -62,7 +62,7 @@ import patientdb.data.Staging;
  * @TODO:2019-01-15:Dialog "Speichern abbrechen" -done
  * @TODO:2019-01-15:ICD-O Eintrag bei Patientenwechseln aktuallieren -> ICD-O
  * ComboBox removed, while unused
- *
+ * @TODO:2019-01-29:Sitzung löschen Button hinzufügen -done
  */
 public class PatientViewController implements Initializable {
 
@@ -157,6 +157,8 @@ public class PatientViewController implements Initializable {
     private Button refreshBt;
     @FXML
     private Button changeSession;
+    @FXML
+    private Button deleteSession;
 
     private DatabaseConnection connection = null;
 
@@ -226,14 +228,17 @@ public class PatientViewController implements Initializable {
                 TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
                 if(selectedItem.getValue() instanceof Series) {
                     changeSession.setDisable(false);
+                    deleteSession.setDisable(false);
                 } else {
                     changeSession.setDisable(true);
+                    deleteSession.setDisable(true);
                 }
             } else {
                 changePatientBt.setDisable(true);
                 deletePatientBt.setDisable(true);
                 addSession.setDisable(true);
                 changeSession.setDisable(true);
+                deleteSession.setDisable(true);
                 clearMask();
             }
         });
@@ -617,6 +622,16 @@ public class PatientViewController implements Initializable {
             abortSession.setVisible(true);
             this.changeSessionStatus = true;
             changeCSS(changeSession, false, "button-active");
+        }
+    }
+    
+    @FXML
+    public void deleteSessionAction(ActionEvent event){
+        TreeItem selectedItem = (TreeItem) patientTable.getSelectionModel().getSelectedItem();
+        if (selectedItem.getValue() instanceof Series) {
+            Series temp = (Series) selectedItem.getValue();
+            connection.deleteSession(temp);
+            updateList();
         }
     }
 

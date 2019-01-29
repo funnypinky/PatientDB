@@ -552,6 +552,16 @@ public class DatabaseConnection {
         }
         return false;
     }
+    
+    public boolean deleteSession(Series serie) {
+        try (Connection conn = this.connect();
+                Statement stmt = conn.createStatement()) {
+            return stmt.executeUpdate("DELETE FROM SESSIONTABLE WHERE UNIQUEID='" + serie.getUniqueID() + "'") > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
 
     public Connection connect() {
         // SQLite connection string

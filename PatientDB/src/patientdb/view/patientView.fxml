@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -23,7 +29,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="patientdb.view.PatientViewController">
    <children>
       <FlowPane>
          <children>
@@ -215,6 +221,7 @@
                                  <children>
                                     <Button fx:id="addSession" disable="true" mnemonicParsing="false" onAction="#addSessionAction" text="Neue Sitzung" />
                                     <Button fx:id="changeSession" disable="true" mnemonicParsing="false" onAction="#changeSessionAction" text="Sitzung ändern" />
+                                    <Button fx:id="deleteSession" disable="true" mnemonicParsing="false" onAction="#deleteSessionAction" text="Sitzung löschen" />
                                     <Button fx:id="saveSession" mnemonicParsing="false" onAction="#saveSession" text="Speichern" visible="false" />
                                     <Button fx:id="abortSession" mnemonicParsing="false" onAction="#abortSessionAction" text="Abbrechen" visible="false" />
                                  </children>
